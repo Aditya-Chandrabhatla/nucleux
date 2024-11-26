@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react';
 import { extendTheme } from '@mui/material/styles';
 
@@ -11,12 +12,7 @@ import {
   MessageSquare,
   GraduationCap,
   Settings,
-  LogOut,
-  ChevronLeft,
-  ChevronRight,
-  Bell,
-  User
-} from 'lucide-react';
+  LogOut} from 'lucide-react';
 import Dashboard from './dashboard';
 
 const NAVIGATION: Navigation = [
