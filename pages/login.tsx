@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Info } from 'lucide-react';
-import { Box, Button, Dialog, TextField, Typography, Link, InputAdornment, IconButton } from '@mui/material';
+import { Box, Button, TextField, Typography, Link, InputAdornment, IconButton } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPrivacySettings, setShowPrivacySettings] = useState(true);
+
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
@@ -207,60 +207,7 @@ const LoginPage = () => {
         </Box>
       </Box>
 
-      {/* Privacy Settings Modal */}
-      <Dialog
-        open={showPrivacySettings}
-        onClose={() => setShowPrivacySettings(false)}
-        PaperProps={{
-          sx: {
-            backgroundColor: '#1c1c1c',
-            color: 'white',
-            padding: 4,
-            maxWidth: 500,
-            margin: 'auto',
-          },
-        }}
-      >
-        <Typography variant="h6" sx={{ marginBottom: 2 }}>
-          Your privacy settings
-        </Typography>
-        <Typography variant="body2" sx={{ marginBottom: 2 }}>
-          Youre entitled to know which data storage and access technologies we use, which data we
-          and our partners collect using them, and what we or our partners do with this data. Your
-          consent includes not only the processing of data on your devices, but also the processing
-          of your data based on usage.
-        </Typography>
-        <Typography variant="body2" sx={{ marginBottom: 2 }}>
-          You can consent by opting in to specific purposes, or by choosing &#34;Accept all&quot;. You can
-          update your settings or revoke consent any time by following the &quot;Privacy Settings&quot;
-          button in the app settings.
-        </Typography>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', marginTop: 4 }}>
-          <Button
-            variant="outlined"
-            onClick={() => setShowPrivacySettings(false)}
-            sx={{
-              color: 'white',
-              borderColor: 'white',
-              '&:hover': { backgroundColor: '#333' },
-            }}
-          >
-            Deny
-          </Button>
-          <Button
-            variant="contained"
-            onClick={() => setShowPrivacySettings(false)}
-            sx={{
-              background: 'linear-gradient(to right, #1e88e5, #8e24aa)',
-              '&:hover': {
-                background: 'linear-gradient(to right, #1565c0, #6a1b9a)',
-              },
-            }}
-          >
-            Continue
-          </Button>
-        </Box>
-      </Dialog>
+
     </Box>
   );
 };
