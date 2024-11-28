@@ -67,7 +67,7 @@ const Register = () => {
   const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
 
-    if (!firstName || !lastName || !email || !password || !phonenumber || !gender || !dateOfBirth || !confPassword) {
+    if (!firstName || !lastName || !email || !password || !gender || !dateOfBirth || !confPassword) {
       setSnackbarMessage('Please fill in all fields.');
       setOpenSnackbar(true);
     } else if (!validateEmail(email)) {
@@ -79,19 +79,15 @@ const Register = () => {
     } else if (!validateDateOfBirth(dateOfBirth)) {
       setSnackbarMessage('Please enter a valid date of birth (YYYY-MM-DD) above 2006 ');
       setOpenSnackbar(true);
-    } else if ((phonenumber.length === 3 || phonenumber.length<15)) {
-      console.log(phonenumber.length)
-      setSnackbarMessage(`Please Enter Valid Phone Number`);
-      setOpenSnackbar(true);
     } else {
       setwaiting(true);
       try {
-        const response = await axios.post('https://wikitube-new.vercel.app/api/register/', {
+        const response = await axios.post('https://nucleux-puce.vercel.app/api/register/', {
           first_name: firstName,
           last_name: lastName,
           email,
           password: confPassword,
-          phone_number: phonenumber,
+          confirm_password:confPassword,
           date_of_birth: dateOfBirth,
           gender,
         });
@@ -103,8 +99,9 @@ const Register = () => {
         }
       } catch (error: any) {
         setwaiting(false);
-        setSnackbarMessage(error.response?.data?.error);
+        setSnackbarMessage(error.response?.data?.email);
         setOpenSnackbar(true);
+        console.log(error)
       }
     }
   };
@@ -311,9 +308,9 @@ const Register = () => {
     <MenuItem value="" disabled>
       Gender
     </MenuItem>
-    <MenuItem value={"male"}>Male</MenuItem>
-    <MenuItem value={"female"}>Female</MenuItem>
-    <MenuItem value={"other"}>Others</MenuItem>
+    <MenuItem value={"M"}>Male</MenuItem>
+    <MenuItem value={"F"}>Female</MenuItem>
+    <MenuItem value={"O"}>Others</MenuItem>
   </Select>
 </FormControl>
 

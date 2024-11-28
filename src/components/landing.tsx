@@ -20,6 +20,16 @@ import {
 
 const Profile = () => {
   const [step, setStep] = useState(0);
+  const [year, setYear] = useState<string>('');
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    // Allow only numeric input and restrict length to 4 characters
+    if (/^\d{0,4}$/.test(value)) {
+      setYear(value);
+    }
+  };
   const [formData, setFormData] = useState({
     country: '',
     role: '',
@@ -134,9 +144,13 @@ const Profile = () => {
                
               </Select> */}
               <TextField
-              
-              onChange={(e) => updateFormData('graduationYear', e.target.value)}
-              label="Expected Graduation Year" />
+        placeholder='Expected Graduation Year'
+        value={year}
+        onChange={handleChange}
+        inputProps={{ maxLength: 4, inputMode: 'numeric', pattern: '\\d*' }}
+        helperText="Enter a valid year (e.g., 2025)"
+        fullWidth
+      />
             </FormControl>
           </Box>
         );

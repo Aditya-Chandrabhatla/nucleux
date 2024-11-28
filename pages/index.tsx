@@ -1,15 +1,68 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
 import React, { useState } from 'react';
-import { Box, Button, TextField, Typography, Link, InputAdornment, IconButton } from '@mui/material';
+import { Box, Button, TextField, Typography, Link, InputAdornment, IconButton, Snackbar, Alert } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useRouter } from 'next/router';
+import axios from 'axios';
+import Cookies from 'js-cookie';
+
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const [showPassword, setShowPassword] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [waiting, setwaiting] = React.useState(false);
+  const [snackbarMessage, setSnackbarMessage] = React.useState('');
+
 
   const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+  const navigate = useRouter()
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubmit = async (event: { preventDefault: () => void; }) => {
+    event.preventDefault();
+    if (!email || !password) {
+      setSnackbarMessage('Please fill in all fields.');
+      setOpenSnackbar(true);
+    } else if (!validateEmail(email)) {
+      setSnackbarMessage('Please enter a valid email address.');
+      setOpenSnackbar(true);
+    } else {
+
+      setwaiting(true)
+      try{
+        setwaiting(true)
+        const response =  await axios.post('https://nucleux-puce.vercel.app/api/login/', { email, password, });
+        
+        if (response.status === 200) {
+          
+          setSnackbarMessage('Login successful!');
+          setwaiting(false)
+          setOpenSnackbar(true);
+          Cookies.set('access_token', response.data.access, { expires: 7 });
+          setTimeout(() => navigate.push("/landing"), 3000); 
+        
+      }
+    }catch(error:any){
+      setwaiting(false)
+      setSnackbarMessage(error.response?.data?.error || "No user found with this email address! ");
+        setOpenSnackbar(true);
+      }
+    }
+  };
+
+
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
 
 
   return (
@@ -64,6 +117,8 @@ const LoginPage = () => {
   value={email}
   onChange={(e) => setEmail(e.target.value)}
   placeholder="Email address"
+  error={!validateEmail(email) && email.length > 0}
+helperText={!validateEmail(email) && email.length > 0 ? "Invalid email format" : ""}
   InputProps={{
     sx: {
       backgroundColor: 'rgba(17, 24, 39, 0.5)', // Matches bg-gray-900/50
@@ -149,9 +204,18 @@ const LoginPage = () => {
           </Box>
 
           {/* Login Button */}
-          <Button
+         {waiting ? <Button
             fullWidth
             variant="contained"
+            disabled
+            onClick={handleSubmit}
+           
+          >
+            LOGIN
+          </Button> : <Button
+            fullWidth
+            variant="contained"
+            onClick={handleSubmit}
             sx={{
               background: 'linear-gradient(to right, #1e88e5, #8e24aa)',
               '&:hover': {
@@ -160,15 +224,18 @@ const LoginPage = () => {
             }}
           >
             LOGIN
-          </Button>
-
-
-
-
-
+          </Button>}
         </Box>
       </Box>
-
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert onClose={handleCloseSnackbar} severity={snackbarMessage === 'Login successful!' ? 'success' : 'error'} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
     </Box>
   );
