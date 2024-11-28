@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 import * as React from 'react';
@@ -219,7 +220,7 @@ const [confPassword,setConfPassword] = React.useState('');
         </Box> */}
 
         {/* Login Button */}
-        <Button
+       {!waiting&& <Button
           fullWidth
           variant="contained"
           onClick={handleSubmit}
@@ -231,7 +232,22 @@ const [confPassword,setConfPassword] = React.useState('');
           }}
         >
           Reset Password
-        </Button>
+        </Button>}
+
+        {waiting&& <Button
+          fullWidth
+          variant="contained"
+          disabled
+          onClick={handleSubmit}
+          sx={{
+            background: 'linear-gradient(to right, #1e88e5, #8e24aa)',
+            '&:hover': {
+              background: 'linear-gradient(to right, #1565c0, #6a1b9a)',
+            },
+          }}
+        >
+          Reset Password
+        </Button>}
 
 
 
