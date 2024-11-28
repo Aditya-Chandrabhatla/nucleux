@@ -15,7 +15,7 @@ import {
   Typography,
 } from '@mui/material';
 
-const OnboardingFlow = () => {
+const Profile = () => {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
     country: '',
@@ -259,4 +259,4 @@ const OnboardingFlow = () => {
   );
 };
 
-export default OnboardingFlow;
+export default Profile;

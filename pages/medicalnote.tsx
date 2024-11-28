@@ -199,6 +199,7 @@ const MedicalNoteReader = () => {
             <Button
               startIcon={<ArrowBack />}
               sx={{ mb: 3, color: 'text.secondary' }}
+              href='/sidebar'
             >
               Back to Library
             </Button>

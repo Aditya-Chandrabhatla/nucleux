@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Info } from 'lucide-react';
 import { Box, Button, TextField, Typography, Link, InputAdornment, IconButton } from '@mui/material';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -21,41 +20,7 @@ const LoginPage = () => {
         color: 'white',
       }}
     >
-      {/* Header */}
-      {/* <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          padding: 2,
-        }}
-      >
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <ChevronLeft />
-          <Typography variant="body1" sx={{ marginLeft: 1 }}>
-            Search
-          </Typography>
-        </Box>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-          <Typography variant="body2">11:25 PM</Typography>
-          <Typography variant="body2">Sun 24 Nov</Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="body2">37%</Typography>
-            <svg
-              className="battery-icon"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <rect x="7" y="7" width="10" height="10" strokeWidth="2" />
-            </svg>
-          </Box>
-        </Box>
-      </Box> */}
 
-      {/* Main Content */}
       <Box
         sx={{
           display: 'flex',
@@ -173,6 +138,16 @@ const LoginPage = () => {
       />
 
 
+<Box sx={{ display:"flex",justifyContent:"space-between",alignItems:"center" }}>
+            <Link href="/register" underline="hover" sx={{ color: 'white' }}>
+              Create a new account
+            </Link>
+
+            <Link href="/forgotpassword" underline="hover" sx={{ color: 'white' }}>
+              Forgot password?
+            </Link>
+          </Box>
+
           {/* Login Button */}
           <Button
             fullWidth
@@ -187,23 +162,10 @@ const LoginPage = () => {
             LOGIN
           </Button>
 
-          {/* Forgot Password */}
-          <Box sx={{ textAlign: 'center' }}>
-            <Link href="#" underline="hover" sx={{ color: 'white' }}>
-              Forgot password?
-            </Link>
-          </Box>
 
-          {/* Info Section */}
-          <Box sx={{ display: 'flex', gap: 1, marginTop: 4 }}>
-            <Info />
-            <Typography variant="body2">
-              Signed up using Google, Facebook or your Institution?{' '}
-              <Link href="#" underline="hover" sx={{ color: '#8e24aa' }}>
-                {`You'll need to set a password first.`}
-              </Link>
-            </Typography>
-          </Box>
+
+
+
         </Box>
       </Box>
 

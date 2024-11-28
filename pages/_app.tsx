@@ -8,8 +8,8 @@ const darkTheme = createTheme({
   palette: {
     mode: "dark",
     background: {
-      default: "#121212", // Set the default background color
-      paper: "#1e1e1e",   // Set the background color for Paper components
+      default: "#111827", // Set the default background color
+      paper: "#111827",   // Set the background color for Paper components
     },
     text: {
       primary: "#ffffff", // Set text color for better contrast
