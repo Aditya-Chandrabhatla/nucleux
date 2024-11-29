@@ -11,6 +11,7 @@ const ForgotPassword = () => {
   const [email, setEmail] = React.useState('');
 
   const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const [waiting, setWaiting] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
    const navigate = useRouter();
 
@@ -33,13 +34,16 @@ const ForgotPassword = () => {
       // setTimeout(() => navigate("/"), 3000); 
      
       try{
+        setWaiting(true)
         const response =  await axios.post('https://nucleux-puce.vercel.app/api/password-reset/', { email });
         if (response.status === 200) {
+          setWaiting(false)
           setSnackbarMessage('Reset Password Link Sent To Your Email');
           setOpenSnackbar(true);
            setTimeout(() => navigate.push("/"), 3000); 
       }
     }catch(error:unknown){
+      setWaiting(false)
       setSnackbarMessage(error.response?.data?.email );
         setOpenSnackbar(true);
       }
@@ -148,6 +152,7 @@ inputProps={{
               background: 'linear-gradient(to right, #1565c0, #6a1b9a)',
             },
           }}
+          disabled={waiting}
         >
           Forgot Password
         </Button>

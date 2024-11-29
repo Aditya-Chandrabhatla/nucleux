@@ -92,7 +92,7 @@ const Register = () => {
           gender,
         });
         if (response.status === 201 || response.status === 200) {
-          setSnackbarMessage('Verification Link Sent To Your Mail!');
+          setSnackbarMessage('User registered and activated successfully.');
           setOpenSuccessSnackbar(true);
           setwaiting(false);
           setTimeout(() => navigate.push("/"), 3000);
@@ -159,7 +159,7 @@ const Register = () => {
 
             <Grid container display={"flex"} justifyContent={"center"}>
               <Grid xs={12} md={6}>
-                <FormControl sx={{ ml: 2, width: { md: '90%', xs: "95%" } }} variant="outlined">
+                <FormControl sx={{ ml: {xs:0,md:2}, width: { md: '90%', xs: "100%" } }} variant="outlined">
                   <TextField
                     id="FirstName"
                     required
@@ -195,7 +195,7 @@ const Register = () => {
                 </FormControl>
               </Grid>
               <Grid xs={12} md={6}>
-                <FormControl sx={{ ml: 2, width: { md: '90%', xs: "95%" } }} variant="outlined">
+                <FormControl sx={{ml: {xs:0,md:2}, width: { md: '90%', xs: "100%" } }} variant="outlined">
                   <TextField
                     id="LastName"
                     required
@@ -232,7 +232,7 @@ const Register = () => {
               </Grid>
 
               <Grid xs={12} md={6}>
-                <FormControl sx={{ ml: 2, width: { md: '90%', xs: "95%" } }} variant="outlined">
+                <FormControl sx={{ml: {xs:0,md:2}, width: { md: '90%', xs: "100%" } }} variant="outlined">
                   <TextField
                     id="dateOfBirth"
                     required
@@ -271,8 +271,7 @@ const Register = () => {
               <Grid xs={12} md={6}>
               <FormControl
   sx={{
-    ml: 2,
-    width: { md: '90%', xs: "95%" },
+    ml: {xs:0,md:2}, width: { md: '90%', xs: "100%" },
     '& .MuiOutlinedInput-root': {
       backgroundColor: 'rgba(17, 24, 39, 0.5)', // Matches bg-gray-900/50
       color: 'white',
@@ -318,7 +317,7 @@ const Register = () => {
               </Grid>
 
               <Grid xs={12} md={12}>
-                <FormControl sx={{ ml: 2, width: { md: '95%', xs: "95%" } }} variant="outlined">
+                <FormControl sx={{ml: {xs:0,md:2}, width: { md: '95%', xs: "100%" } }} variant="outlined">
 
           <TextField
           id="email"
@@ -369,7 +368,7 @@ const Register = () => {
               </Grid> */}
 
               <Grid xs={12} md={6}>
-                <FormControl sx={{ ml: 2, width: { md: '90%', xs: "95%" } }} variant="outlined">
+                <FormControl sx={{ ml: {xs:0,md:2}, width: { md: '90%', xs: "100%" } }} variant="outlined">
 
                   <TextField
                     id="outlined-adornment-password"
@@ -418,7 +417,7 @@ const Register = () => {
                 </FormControl>
               </Grid>
               <Grid xs={12} md={6}>
-                <FormControl sx={{ ml: 2, width: { md: '90%', xs: "95%" } }} variant="outlined">
+                <FormControl sx={{ ml: {xs:0,md:2}, width: { md: '90%', xs: "100%" } }} variant="outlined">
                   <TextField
                     id="outlined-adornment-password"
                     type={showConfPassword ? 'text' : 'password'}
@@ -467,7 +466,7 @@ const Register = () => {
               </Grid>
 
               <Grid xs={12} md={12}>
-                <FormControl sx={{ ml: 2, width: { md: '95%', xs: "95%" } }} variant="outlined">
+                <FormControl sx={{ ml: {xs:0,md:2}, width: { md: '95%', xs: "100%" }}} variant="outlined">
                   <Button type='submit' fullWidth
             variant="contained"
             sx={{
@@ -480,7 +479,12 @@ const Register = () => {
               </Grid>
             </Grid>
 
-            <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
+
+
+            <Typography mt={2} mb={1}>Already have an account? <Link href="/" underline='hover' sx={{color:"white"}}>Sign in</Link></Typography>
+          </Stack>
+        </Stack>
+        <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
               <Alert onClose={handleCloseSnackbar} severity="error" sx={{ width: '100%' }}>
                 {snackbarMessage}
               </Alert>
@@ -491,11 +495,6 @@ const Register = () => {
                 {snackbarMessage}
               </Alert>
             </Snackbar>
-
-            <Typography mt={2} mb={1}>Already have an account? <Link href="/" underline='hover' sx={{color:"white"}}>Sign in</Link></Typography>
-          </Stack>
-        </Stack>
-
     </Box>
   );
 };

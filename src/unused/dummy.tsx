@@ -44,10 +44,10 @@ useEffect(() => {
       const response = await axios.get('https://nucleux-puce.vercel.app/api/university/');
       const data = response.data;
 
-      setUniversities(data.universities);
+      setUniversities(data.universities.map((uni) => uni.university_name));
       setReferrals(data.referrals.map((ref) => ref.referral_name));
-      setProfessions(data.professions);
-      setObjectives(data.objectives);
+      setProfessions(data.professions.map((prof) => prof.profession_name));
+      setObjectives(data.objectives.map((obj) => obj.objective_name));
     } catch (error) {
       console.error('Error fetching data:', error);
     }
@@ -110,53 +110,51 @@ const handleCloseSnackbar = () => {
   };
 
 
-  const handleFinish = async() => {
-    console.log('Form submitted:', formData);
-    const universityId = universities.find((uni) => uni.university_name === formData.university)?.id || null;
-const professionId = professions.find((prof) => prof.profession_name === formData.role)?.id || null;
-const objectiveId = objectives.find((obj) => obj.objective_name === formData.objective)?.id || null;
+const handleFinish = async () => {
+  console.log('Form submitted:', formData);
 
+  if (!formData) {
+    return null;
+  } else {
+    try {
+      setWaiting(true);
 
+      // Map names to their corresponding IDs
+      const universityId = universities.find((uni) => uni.university_name === formData.university)?.id || null;
+      const professionId = professions.find((prof) => prof.profession_name === formData.role)?.id || null;
+      const objectiveId = objectives.find((obj) => obj.objective_name === formData.objective)?.id || null;
 
-    if (!formData){
-      return null
-    }
-    else{
-      try{
-        setWaiting(true)
-        const response = await axios.put("https://nucleux-puce.vercel.app/api/edit-profile/",
-          {
-            country: formData.country,
-    university: universityId,
-    profession: professionId,
-    expected_graduation_date: `${formData.graduationYear}-01-01`,
-    current_area_of_focus: 2,
-    objectives: objectiveId
+      const payload = {
+        country: formData.country,
+        university: universityId,
+        profession: professionId,
+        expected_graduation_date: `${formData.graduationYear}-01-01`,
+        current_area_of_focus: 2, // Replace with the appropriate value or logic
+        objectives: objectiveId,
+      };
+
+      const response = await axios.put(
+        "https://nucleux-puce.vercel.app/api/edit-profile/",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${bearer_token}`,
           },
-          {
-            headers: {
-                Authorization: `Bearer ${bearer_token}`
-            }
-
-        })
-
-        if (response.status===200){
-          setSnackbarMessage('Profile Updated');
-          setOpenSnackbar(true);
         }
+      );
 
-
-      }
-      catch(err){
-        console.log(err)
-        setSnackbarMessage('Profile Updating Error');
+      if (response.status === 200) {
+        setSnackbarMessage("Profile Updated");
         setOpenSnackbar(true);
-        setWaiting(false)
+      }
+    } catch (err) {
+      console.log(err);
+      setSnackbarMessage("Profile Updating Error");
+      setOpenSnackbar(true);
+      setWaiting(false);
     }
-    }
-    
-    
-  };
+  }
+};
 
   const renderStepContent = (stepIndex) => {
     switch (stepIndex) {
@@ -183,13 +181,13 @@ const objectiveId = objectives.find((obj) => obj.objective_name === formData.obj
             <Box display="flex" flexDirection="column" gap={1}>
   {professions.map((role) => (
     <Button
-      key={role.id}
+      key={role}
       variant="outlined"
-      color={formData.role === role.profession_name ? 'primary' : 'inherit'}
-      onClick={() => updateFormData('role', role.profession_name)}
+      color={formData.role === role ? 'primary' : 'inherit'}
+      onClick={() => updateFormData('role', role)}
       fullWidth
     >
-      {role.profession_name}
+      {role}
     </Button>
   ))}
 </Box>
@@ -212,8 +210,8 @@ const objectiveId = objectives.find((obj) => obj.objective_name === formData.obj
       <em>Please select</em>
     </MenuItem>
     {universities.map((uni) => (
-      <MenuItem key={uni.id} value={uni.university_name} >
-        {uni.university_name}
+      <MenuItem key={uni} value={uni}>
+        {uni}
       </MenuItem>
     ))}
   </Select>
@@ -251,8 +249,8 @@ const objectiveId = objectives.find((obj) => obj.objective_name === formData.obj
       <em>Please select</em>
     </MenuItem>
     {objectives.map((obj) => (
-      <MenuItem key={obj.id} value={obj.objective_name}>
-        {obj.objective_name}
+      <MenuItem key={obj} value={obj}>
+        {obj}
       </MenuItem>
     ))}
   </Select>
