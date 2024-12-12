@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 
-import React, { useState } from 'react';  
+import React, { useState, useEffect } from 'react';  
 import {  
   Box,  
   Button,  
@@ -20,6 +20,7 @@ import {
   Collapse,  
   Paper,  
   Stack,  
+  Skeleton,  
 } from '@mui/material';  
 import {  
   ChevronRight,  
@@ -27,88 +28,10 @@ import {
   Clock,  
   Star,  
   Folder,  
-  FileText,  
   AlertCircle,  
   PlusCircle,  
 } from 'lucide-react';  
-  
-const LIBRARY_SECTIONS = {  
-  "Basic Sciences": {  
-   "Anatomy": {  
-    "Upper Limb": {  
-      "Shoulder": ["Scapula", "Humerus", "Clavicle"],  
-      "Arm": ["Biceps", "Triceps", "Forearm"],  
-      "Forearm": ["Radius", "Ulna", "Wrist"],  
-      "Hand": ["Carpals", "Metacarpals", "Phalanges"],  
-    },  
-    "Lower Limb": {  
-      "Hip": ["Pelvis", "Femur", "Acetabulum"],  
-      "Thigh": ["Femur", "Patella", "Quadriceps"],  
-      "Leg": ["Tibia", "Fibula", "Ankle"],  
-      "Foot": ["Tarsals", "Metatarsals", "Phalanges"],  
-    },  
-    "Thorax": {  
-      "Chest Wall": ["Sternum", "Ribs", "Thoracic Vertebrae"],  
-      "Lungs": ["Trachea", "Bronchi", "Alveoli"],  
-      "Heart": ["Atria", "Ventricles", "Coronary Arteries"],  
-    },  
-    "Abdomen": {  
-      "Abdominal Wall": ["Skin", "Muscles", "Peritoneum"],  
-      "Peritoneum": ["Parietal Peritoneum", "Visceral Peritoneum", "Mesentery"],  
-      "Digestive System": ["Mouth", "Esophagus", "Stomach"],  
-    },  
-   },  
-   "Physiology": {  
-    "Upper Limb": {  
-      "Shoulder": ["Scapula", "Humerus", "Clavicle"],  
-      "Arm": ["Biceps", "Triceps", "Forearm"],  
-      "Forearm": ["Radius", "Ulna", "Wrist"],  
-      "Hand": ["Carpals", "Metacarpals", "Phalanges"],  
-    },  
-    "Lower Limb": {  
-      "Hip": ["Pelvis", "Femur", "Acetabulum"],  
-      "Thigh": ["Femur", "Patella", "Quadriceps"],  
-      "Leg": ["Tibia", "Fibula", "Ankle"],  
-      "Foot": ["Tarsals", "Metatarsals", "Phalanges"],  
-    },  
-    "Thorax": {  
-      "Chest Wall": ["Sternum", "Ribs", "Thoracic Vertebrae"],  
-      "Lungs": ["Trachea", "Bronchi", "Alveoli"],  
-      "Heart": ["Atria", "Ventricles", "Coronary Arteries"],  
-    },  
-    "Abdomen": {  
-      "Abdominal Wall": ["Skin", "Muscles", "Peritoneum"],  
-      "Peritoneum": ["Parietal Peritoneum", "Visceral Peritoneum", "Mesentery"],  
-      "Digestive System": ["Mouth", "Esophagus", "Stomach"],  
-    },  
-   },
-   "Pathology": {  
-    "Upper Limb": {  
-      "Shoulder": ["Scapula", "Humerus", "Clavicle"],  
-      "Arm": ["Biceps", "Triceps", "Forearm"],  
-      "Forearm": ["Radius", "Ulna", "Wrist"],  
-      "Hand": ["Carpals", "Metacarpals", "Phalanges"],  
-    },  
-    "Lower Limb": {  
-      "Hip": ["Pelvis", "Femur", "Acetabulum"],  
-      "Thigh": ["Femur", "Patella", "Quadriceps"],  
-      "Leg": ["Tibia", "Fibula", "Ankle"],  
-      "Foot": ["Tarsals", "Metatarsals", "Phalanges"],  
-    },  
-    "Thorax": {  
-      "Chest Wall": ["Sternum", "Ribs", "Thoracic Vertebrae"],  
-      "Lungs": ["Trachea", "Bronchi", "Alveoli"],  
-      "Heart": ["Atria", "Ventricles", "Coronary Arteries"],  
-    },  
-    "Abdomen": {  
-      "Abdominal Wall": ["Skin", "Muscles", "Peritoneum"],  
-      "Peritoneum": ["Parietal Peritoneum", "Visceral Peritoneum", "Mesentery"],  
-      "Digestive System": ["Mouth", "Esophagus", "Stomach"],  
-    },  
-   }, 
-  },  
-  
-};  
+import axios from 'axios';  
   
 const darkTheme = createTheme({  
   palette: {  
@@ -181,6 +104,55 @@ const CollapsibleLibrary = () => {
   const [selectedSubtopic, setSelectedSubtopic] = useState(null);  
   const [selectedSubsubtopic, setSelectedSubsubtopic] = useState(null);  
   const [searchQuery, setSearchQuery] = useState('');  
+  const [librarySections, setLibrarySections] = useState({});  
+  const [loading, setLoading] = useState(true);  
+  
+  useEffect(() => {  
+   const fetchLibrarySections = async () => {  
+    try {  
+      const response = await axios.get('https://nucleux-puce.vercel.app/api/layera/');  
+      const data = response.data;  
+      const transformedData = transformData(data);  
+      setLibrarySections(transformedData);  
+      setLoading(false);  
+    } catch (error) {  
+      console.error(error.message);  
+      setLoading(false);  
+    }  
+   };  
+  
+   fetchLibrarySections();  
+  }, []);  
+  
+  function transformData(data) {  
+   const transformed = {};  
+  
+   data.forEach((layerA) => {  
+    const layerAName = layerA.layer_a_name;  
+    transformed[layerAName] = {};  
+  
+    layerA.layer_bs.forEach((layerB) => {  
+      const layerBName = layerB.layer_b_name;  
+      transformed[layerAName][layerBName] = {};  
+  
+      layerB.layer_cs.forEach((layerC) => {  
+       const layerCName = layerC.layer_c_name;  
+       transformed[layerAName][layerBName][layerCName] = {};  
+  
+       layerC.layer_ds.forEach((layerD) => {  
+        const layerDName = layerD.layer_d_name;  
+  
+        transformed[layerAName][layerBName][layerCName][layerDName] =  
+          layerD.layer_es && layerD.layer_es.length > 0  
+           ? layerD.layer_es.map((layerE) => layerE.layer_e_name || "Unknown")  
+           : null;  
+       });  
+      });  
+    });  
+   });  
+  
+   return transformed;  
+  }  
   
   const handleSectionClick = (section) => {  
    setSelectedSection(section === selectedSection ? null : section);  
@@ -246,87 +218,117 @@ const CollapsibleLibrary = () => {
   
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>  
        <Paper sx={{ width: 240, overflow: 'auto' }}>  
-        <List>  
-          {Object.keys(LIBRARY_SECTIONS).map((section) => (  
-           <React.Fragment key={section}>  
-            <NavMenuItem  
-              icon={Folder}  
-              label={section}  
-              isActive={selectedSection === section}  
-              onClick={() => handleSectionClick(section)}  
-              hasSubitems={true}  
-            />  
-            <Collapse in={selectedSection === section}>  
-              <List sx={{ pl: 2 }}>  
-               {Object.keys(LIBRARY_SECTIONS[section]).map((subsection) => (  
-                <NavMenuItem  
-                  key={subsection}  
-                  icon={FileText}  
-                  label={subsection}  
-                  isActive={selectedSubsection === subsection}  
-                  onClick={() => handleSubsectionClick(subsection)}  
-                  hasSubitems={true}  
-                />  
-               ))}  
-              </List>  
-            </Collapse>  
-           </React.Fragment>  
-          ))}  
-        </List>  
-       </Paper>  
-  
-       {selectedSection && selectedSubsection && (  
-        <Paper sx={{ width: 240, overflow: 'auto' }}>  
+        {loading ? (  
           <List>  
-           {Object.keys(LIBRARY_SECTIONS[selectedSection][selectedSubsection]).map((topic) => (  
-            <React.Fragment key={topic}>  
+           {[1, 2, 3, 4, 5].map((index) => (  
+            <ListItemButton key={index}>  
+              <ListItemIcon>  
+               <Skeleton variant="circular" width={20} height={20} />  
+              </ListItemIcon>  
+              <ListItemText primary={<Skeleton width={100} />} />  
+            </ListItemButton>  
+           ))}  
+          </List>  
+        ) : (  
+          <List>  
+           {Object.keys(librarySections).map((section) => (  
+            <React.Fragment key={section}>  
               <NavMenuItem  
-               icon={FileText}  
-               label={topic}  
-               isActive={selectedTopic === topic}  
-               onClick={() => handleTopicClick(topic)}  
-               hasSubitems={LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic] && typeof LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic] === 'object'}  
+               icon={Folder}  
+               label={section}  
+               isActive={selectedSection === section}  
+               onClick={() => handleSectionClick(section)}  
+               hasSubitems={true}  
               />  
-              <Collapse in={selectedTopic === topic}>  
+              <Collapse in={selectedSection === section}>  
                <List sx={{ pl: 2 }}>  
-                {LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic] && typeof LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic] === 'object' && Object.keys(LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic]).map((subtopic) => (  
-                  <React.Fragment key={subtopic}>  
-                   <NavMenuItem  
-                    icon={FileText}  
-                    label={subtopic}  
-                    isActive={selectedSubtopic === subtopic}  
-                    onClick={() => handleSubtopicClick(subtopic)}  
-                    hasSubitems={LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic][subtopic] && LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic][subtopic].length > 0}  
-                   />  
-                   <Collapse in={selectedSubtopic === subtopic}>  
-                    <List sx={{ pl: 2 }}>  
-                      {LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic][subtopic] && LIBRARY_SECTIONS[selectedSection][selectedSubsection][topic][subtopic].map((subsubtopic) => (  
-                       <ListItemButton  
-                        key={subsubtopic}  
-                        onClick={() => setSelectedSubsubtopic(subsubtopic)}  
-                        selected={selectedSubsubtopic === subsubtopic}  
-                        sx={{  
-                          borderRadius: 1,  
-                          m: 1,  
-                        }}  
-                       >  
-                        <ListItemText primary={subsubtopic} />  
-                       </ListItemButton>  
-                      ))}  
-                    </List>  
-                   </Collapse>  
-                  </React.Fragment>  
+                {Object.keys(librarySections[section]).map((subsection) => (  
+                  <NavMenuItem  
+                   key={subsection}  
+                   icon={Folder}  
+                   label={subsection}  
+                   isActive={selectedSubsection === subsection}  
+                   onClick={() => handleSubsectionClick(subsection)}  
+                   hasSubitems={true}  
+                  />  
                 ))}  
                </List>  
               </Collapse>  
             </React.Fragment>  
            ))}  
           </List>  
+        )}  
+       </Paper>  
+  
+       {selectedSection && selectedSubsection && (  
+        <Paper sx={{ width: 240, overflow: 'auto' }}>  
+          {loading ? (  
+           <List>  
+            {[1, 2, 3, 4, 5].map((index) => (  
+              <ListItemButton key={index}>  
+               <ListItemIcon>  
+                <Skeleton variant="circular" width={20} height={20} />  
+               </ListItemIcon>  
+               <ListItemText primary={<Skeleton width={100} />} />  
+              </ListItemButton>  
+            ))}  
+           </List>  
+          ) : (  
+           <List>  
+            {Object.keys(librarySections[selectedSection][selectedSubsection]).map((topic) => (  
+              <React.Fragment key={topic}>  
+               <NavMenuItem  
+                icon={Folder}  
+                label={topic}  
+                isActive={selectedTopic === topic}  
+                onClick={() => handleTopicClick(topic)}  
+                hasSubitems={librarySections[selectedSection][selectedSubsection][topic] && typeof librarySections[selectedSection][selectedSubsection][topic] === 'object'}  
+               />  
+               <Collapse in={selectedTopic === topic}>  
+                <List sx={{ pl: 2 }}>  
+                  {librarySections[selectedSection][selectedSubsection][topic] && typeof librarySections[selectedSection][selectedSubsection][topic] === 'object' && Object.keys(librarySections[selectedSection][selectedSubsection][topic]).map((subtopic) => (  
+                   <React.Fragment key={subtopic}>  
+                    <NavMenuItem  
+                      icon={Folder}  
+                      label={subtopic}  
+                      isActive={selectedSubtopic === subtopic}  
+                      onClick={() => handleSubtopicClick(subtopic)}  
+                      hasSubitems={librarySections[selectedSection][selectedSubsection][topic][subtopic] && librarySections[selectedSection][selectedSubsection][topic][subtopic].length > 0}  
+                    />  
+                    <Collapse in={selectedSubtopic === subtopic}>  
+                      <List sx={{ pl: 2 }}>  
+                       {librarySections[selectedSection][selectedSubsection][topic][subtopic] && librarySections[selectedSection][selectedSubsection][topic][subtopic].map((subsubtopic) => (  
+                        <ListItemButton  
+                          key={subsubtopic}  
+                          onClick={() => setSelectedSubsubtopic(subsubtopic)}  
+                          selected={selectedSubsubtopic === subsubtopic}  
+                          sx={{  
+                           borderRadius: 1,  
+                           m: 1,  
+                          }}  
+                        >  
+                          <ListItemText primary={subsubtopic} />  
+                        </ListItemButton>  
+                       ))}  
+                      </List>  
+                    </Collapse>  
+                   </React.Fragment>  
+                  ))}  
+                </List>  
+               </Collapse>  
+              </React.Fragment>  
+            ))}  
+           </List>  
+          )}  
         </Paper>  
        )}  
   
        <Box sx={{ flex: 1, p: 3, overflow: 'auto' }}>  
-        {selectedSubsubtopic ? (  
+        {loading ? (  
+          <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>  
+           <Skeleton variant="rectangular" width={200} height={200} />  
+          </Box>  
+        ) : selectedSubsubtopic ? (  
           <Box>  
            <GradientText variant="h4" gutterBottom fontWeight="bold">  
             {selectedSubsubtopic}  
