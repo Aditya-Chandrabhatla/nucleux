@@ -20,18 +20,21 @@ import {
   Collapse,  
   Paper,  
   Stack,  
-  Skeleton,  
+  Skeleton,
+  Divider,  
 } from '@mui/material';  
 import {  
   ChevronRight,  
-  Search,  
-  Clock,  
-  Star,  
+  Search,    
   Folder,  
   AlertCircle,  
-  PlusCircle,  
+  PlusCircle,
+  Clock,
+  Star,
+  File,  
 } from 'lucide-react';  
 import axios from 'axios';  
+import CustomSeparator from './BreadCrumb';
   
 const darkTheme = createTheme({  
   palette: {  
@@ -179,6 +182,8 @@ const CollapsibleLibrary = () => {
    setSelectedSubtopic(subtopic === selectedSubtopic ? null : subtopic);  
    setSelectedSubsubtopic(null);  
   };  
+
+  console.log(selectedSection,selectedSubsection,selectedSubsubtopic,selectedSubtopic,selectedTopic)
   
   return (  
    <ThemeProvider theme={darkTheme}>  
@@ -217,7 +222,7 @@ const CollapsibleLibrary = () => {
       </Paper>  
   
       <Box sx={{ display: 'flex', flex: 1, overflow: 'hidden' }}>  
-       <Paper sx={{ width: 240, overflow: 'auto' }}>  
+       <Paper sx={{ width: 240, overflow: 'auto','&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none' }}>  
         {loading ? (  
           <List>  
            {[1, 2, 3, 4, 5].map((index) => (  
@@ -259,9 +264,10 @@ const CollapsibleLibrary = () => {
           </List>  
         )}  
        </Paper>  
+       <Divider orientation="vertical" flexItem />
   
        {selectedSection && selectedSubsection && (  
-        <Paper sx={{ width: 240, overflow: 'auto' }}>  
+        <Paper sx={{ width: 240, overflow: 'auto','&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none' }}>  
           {loading ? (  
            <List>  
             {[1, 2, 3, 4, 5].map((index) => (  
@@ -287,32 +293,18 @@ const CollapsibleLibrary = () => {
                <Collapse in={selectedTopic === topic}>  
                 <List sx={{ pl: 2 }}>  
                   {librarySections[selectedSection][selectedSubsection][topic] && typeof librarySections[selectedSection][selectedSubsection][topic] === 'object' && Object.keys(librarySections[selectedSection][selectedSubsection][topic]).map((subtopic) => (  
-                   <React.Fragment key={subtopic}>  
-                    <NavMenuItem  
-                      icon={Folder}  
+                    
+                    <ListItemButton  
+                    key ={subtopic} 
+                      icon={File}  
                       label={subtopic}  
-                      isActive={selectedSubtopic === subtopic}  
-                      onClick={() => handleSubtopicClick(subtopic)}  
-                      hasSubitems={librarySections[selectedSection][selectedSubsection][topic][subtopic] && librarySections[selectedSection][selectedSubsection][topic][subtopic].length > 0}  
-                    />  
-                    <Collapse in={selectedSubtopic === subtopic}>  
-                      <List sx={{ pl: 2 }}>  
-                       {librarySections[selectedSection][selectedSubsection][topic][subtopic] && librarySections[selectedSection][selectedSubsection][topic][subtopic].map((subsubtopic) => (  
-                        <ListItemButton  
-                          key={subsubtopic}  
-                          onClick={() => setSelectedSubsubtopic(subsubtopic)}  
-                          selected={selectedSubsubtopic === subsubtopic}  
-                          sx={{  
-                           borderRadius: 1,  
-                           m: 1,  
-                          }}  
-                        >  
-                          <ListItemText primary={subsubtopic} />  
-                        </ListItemButton>  
-                       ))}  
-                      </List>  
-                    </Collapse>  
-                   </React.Fragment>  
+                      selected={selectedSubtopic === subtopic}  
+                      onClick={() => handleSubtopicClick(subtopic)}
+
+                    >
+                      <ListItemText primary={subtopic} /> 
+                    </ListItemButton>  
+                    
                   ))}  
                 </List>  
                </Collapse>  
@@ -324,14 +316,13 @@ const CollapsibleLibrary = () => {
        )}  
   
        <Box sx={{ flex: 1, p: 3, overflow: 'auto' }}>  
-        {loading ? (  
-          <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>  
-           <Skeleton variant="rectangular" width={200} height={200} />  
-          </Box>  
-        ) : selectedSubsubtopic ? (  
+        { selectedSubtopic ? (  
           <Box>  
-           <GradientText variant="h4" gutterBottom fontWeight="bold">  
-            {selectedSubsubtopic}  
+            <CustomSeparator selectedSection={selectedSection} selectedSubsection={selectedSubsection} selectedTopic={selectedTopic} 
+            selectedSubtopic={selectedSubtopic}  />
+
+           <GradientText variant="h4" gutterBottom fontWeight="bold" mt={5}  >  
+            {selectedSubtopic}  
            </GradientText>  
            <Stack direction="row" spacing={3} sx={{ mb: 3 }}>  
             <Stack direction="row" alignItems="center" spacing={1}>  
@@ -346,10 +337,18 @@ const CollapsibleLibrary = () => {
                Save for later  
               </Typography>  
             </Stack>  
-           </Stack>  
-           <Typography color="text.secondary">  
+           </Stack> 
+
+                      <Stack display={'flex'} flexDirection={'row'} gap={4}>
+           {librarySections[selectedSection][selectedSubsection][selectedTopic][selectedSubtopic].map((subsubtopic) => (
+              <Button key = {subsubtopic} sx={{border:1}}>{subsubtopic}</Button>
+            ))}
+           </Stack> 
+           <Typography color="text.secondary" mt={3}>  
             Select a topic to start learning.  
            </Typography>  
+
+
           </Box>  
         ) : (  
           <Box sx={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>  
@@ -360,7 +359,7 @@ const CollapsibleLibrary = () => {
             </Typography>  
            </Stack>  
           </Box>  
-        )}  
+        ) } 
        </Box>  
       </Box>  
     </Box>  

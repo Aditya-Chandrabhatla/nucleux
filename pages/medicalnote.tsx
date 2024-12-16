@@ -180,7 +180,7 @@ const MedicalNoteReader = () => {
       flexDirection: 'column',
       bgcolor: 'background.default'
     }}>
-      <Box sx={{ display: 'flex', flex: 1 }}>
+      <Box sx={{ display: 'flex', flex: 1,'&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none'  }}>
         {/* Left Sidebar */}
         <Drawer
           variant="permanent"
@@ -191,7 +191,7 @@ const MedicalNoteReader = () => {
               width: 240,
               boxSizing: 'border-box',
               border: 'none',
-              bgcolor: 'background.paper'
+              bgcolor: 'background.paper','&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none' 
             },
           }}
         >
@@ -243,7 +243,7 @@ const MedicalNoteReader = () => {
             </List>
           </Box>
         </Drawer>
-
+<Divider variant='fullWidth' flexItem orientation='vertical'/>
         {/* Main Content Area */}
         <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
           {/* Top Navigation Bar */}
@@ -302,7 +302,7 @@ const MedicalNoteReader = () => {
           </Tabs>
 
           {/* Main Content */}
-          <Box sx={{ flex: 1, overflow: 'auto', p: 3 }}>
+          <Box sx={{ flex: 1, overflow: 'auto', p: 3,'&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none'  }}>
             <Card elevation={0}>
               <CardContent>
                 <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
