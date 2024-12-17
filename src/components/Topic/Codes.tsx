@@ -1,5 +1,5 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Accordion, AccordionSummary, AccordionDetails, Stack, Typography, styled, Divider } from '@mui/material';
+import { Accordion, AccordionSummary, AccordionDetails, Stack, Typography, styled, Divider, Avatar } from '@mui/material';
 import React from 'react'
 
 const Codes = () => {
@@ -20,7 +20,8 @@ const Codes = () => {
   const UnderTypo = styled(Typography)(({  }) => ({
     fontSize:15,
     color:'#babbbf',
-    paddingLeft:15
+    paddingLeft:15,
+    fontFamily:"cursive"
   }));
   return (
     <>
@@ -28,14 +29,21 @@ const Codes = () => {
    <Accordion sx={{maxHeight:300,overflow:'auto','&::-webkit-scrollbar': { display: 'none' },
    '-ms-overflow-style': 'none',"&:hover":{backgroundColor:'#2d2f33'}}}>
            <AccordionSummary
-             expandIcon={<ExpandMoreIcon />}
-             aria-controls="panel1-content"
-             id="panel1-header"
-             sx={{color:"#EC4899",fontFamily:"serif",fontWeight:"bold",fontSize:20}}
-           >
-             CODES
-   
-           </AccordionSummary>
+          expandIcon={<ExpandMoreIcon
+             />}
+          aria-controls="panel1-content"
+          id="panel1-header"
+          
+        >
+          <Stack sx={{display:"flex",alignItems:"center",flexDirection:"row",}}>
+          <Avatar  src='../../../static/images/6.jpg' sx={{mr:2,}} />
+          
+          <Typography sx={{color:"#EC4899",fontFamily:"serif",fontWeight:"bold",fontSize:20,}}>CODES</Typography>
+          </Stack>
+          
+
+        </AccordionSummary>
+
            <AccordionDetails >
                <Stack >
             <SubTitle>ICD10</SubTitle>
