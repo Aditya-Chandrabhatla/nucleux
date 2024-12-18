@@ -36,10 +36,8 @@ const ViewTopic = () => {
             
 
       <Basic/>
-    
       <Diagnosis/>
       <Treatment/>
-    
       <OngoingCare/>
       <Codes/>
         </Stack>

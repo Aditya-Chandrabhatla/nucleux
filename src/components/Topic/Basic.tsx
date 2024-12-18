@@ -1,6 +1,50 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+// @ts-nocheck
+
 import { Accordion, AccordionSummary, AccordionDetails, Stack, Typography, styled, Divider, Avatar } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import React from 'react'
+
+
+
+
+
+
+// const Rough = [
+//   {
+//     heading:"basics",
+//     img:"../../../static/images/1.jpg",
+//     basic_content:[""],
+//     contentLIs:[{
+//       header:["description","epidemiology","incidence","prevalence",{"etiology and pathophysiology":['Coagulopathy','Diseases causing ovulatory dysfunction',
+//   'Medications (iatrogenic causes)']},"genetics","risk factors","general prevention"],
+//       content:[{
+//         header:'1',
+//         content:['Abnormal uterine bleeding (AUB) is uterine bleeding that is irregular in quantity, frequency, or duration.',
+//           'May be acute or chronic (occurring >6 months)',
+//           ' The International Federation of Gynecology and Obstetrics (FIGO) now uses AUB rather thandysfunctional uterine bleeding (DUB).']
+//       },
+//       {
+//         header:'2',
+// 	content:["Adolescent and perimenopausal women are affected most often."]
+//       },
+//       {header:"3",
+// 	content:[" 5% of reproductive-aged women will see a doctor in any given year for AUB"]},
+// 	{header:"4",
+// 	content:[" 3-30% of reproductive-aged women have AUB."]},
+//     ]
+//     },
+//  {
+//         header:'6',
+// 	content:["Unclear but can include inherited disorders of hemostasis"]
+//       },
+// {
+//         header:'7',
+// 	content:["Unopposed estrogen therapy (no. 1 risk factor for endometrial cancer)Increasing age, typically >40 years old; obesity; PCOS; diabetes mellitus; nulliparity; early menarche orlate menopause (>55 years of age); chronic anovulation or infertility; history of breast cancer orendometrial hyperplasia; tamoxifen use; family history: gynecologic, breast, or colon cancer; thyroiddisease"]
+//       }
+//    }
+// ]
+
 
 const Basic = () => {
   
