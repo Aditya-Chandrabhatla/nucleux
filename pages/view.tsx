@@ -290,7 +290,7 @@ const Rough = [
 {
     heading: ' See Also',
     img: '../../../static/images/5.jpg',
-    firstHeader :[' Dysmenorrhea; Menorrhagia (Heavy Menstrual Bleeding)','Algorithm: Abnormal Uterine Bleeding'],
+    basicText :[' Dysmenorrhea; Menorrhagia (Heavy Menstrual Bleeding)','Algorithm: Abnormal Uterine Bleeding'],
 
   },
 
