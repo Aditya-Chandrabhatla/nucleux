@@ -7,6 +7,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Avatar,
+  Button,
   Divider,
   Link,
   Paper,
@@ -15,6 +16,7 @@ import {
   Typography,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { useRouter } from 'next/router';
 
 const Rough = [
     // Basics
@@ -349,6 +351,11 @@ const Rough = [
     };
 
 const View = () => {
+
+  const querying = useRouter()
+  const subsubtopic = querying.query
+  console.log(subsubtopic.w)
+
   const SubTitle = styled(Typography)(({}) => ({
     fontWeight: 'bold',
     fontSize: 20,
@@ -371,13 +378,16 @@ const View = () => {
 
   return (
         <Stack p={3} >
+          <Stack display={"flex"} flexDirection={"row"} justifyContent={"start"}>
+          <Button href='/home' sx={{border:1,mb:2}} >Back to library</Button>
+          </Stack>
         
         <Stack display={'flex'} 
         justifyContent={{md:'space-between',xs:"flex-start"}}
         flexDirection={{md:'row',xs:'column'}}
         alignItems={{md:"center",xs:'flex-start'}}>
         <Typography fontWeight={"bold"} fontSize={28} >
-        Abnormal (Dysfunctional) Uterine Bleeding
+        {subsubtopic.w}
         </Typography>
     
         <Typography fontSize={13}>

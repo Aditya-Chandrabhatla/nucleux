@@ -35,6 +35,7 @@ import {
 } from 'lucide-react';  
 import axios from 'axios';  
 import CustomSeparator from './BreadCrumb';
+import { useRouter } from 'next/router';
   
 const darkTheme = createTheme({  
   palette: {  
@@ -108,7 +109,8 @@ const CollapsibleLibrary = () => {
   const [selectedSubsubtopic, setSelectedSubsubtopic] = useState(null);  
   const [searchQuery, setSearchQuery] = useState('');  
   const [librarySections, setLibrarySections] = useState({});  
-  const [loading, setLoading] = useState(true);  
+  const [loading, setLoading] = useState(true); 
+  const navigate = useRouter() 
   
   useEffect(() => {  
    const fetchLibrarySections = async () => {  
@@ -341,7 +343,7 @@ const CollapsibleLibrary = () => {
 
                       <Stack display={'flex'} flexDirection={'row'} gap={4}>
            {librarySections[selectedSection][selectedSubsection][selectedTopic][selectedSubtopic].map((subsubtopic) => (
-              <Button key = {subsubtopic} sx={{border:1}}>{subsubtopic}</Button>
+              <Button key = {subsubtopic} onClick={()=>{navigate.push(`/view/?w=${subsubtopic}`)}}   sx={{border:1}}>{subsubtopic}</Button>
             ))}
            </Stack> 
            <Typography color="text.secondary" mt={3}>  
