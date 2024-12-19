@@ -8,6 +8,7 @@ import {
   AccordionSummary,
   Avatar,
   Divider,
+  Link,
   Paper,
   Stack,
   styled,
@@ -24,7 +25,7 @@ const Rough = [
         {
           "header": "DESCRIPTION",
           "content": [
-            "Abnormal uterine bleeding (AUB) is uterine bleeding that is irregular in quantity, frequency, or duration.",
+            "Abnormal uterine bleeding (AUB) is *uterine bleeding* that is irregular in quantity, frequency, or duration.",
             "May be acute or chronic (occurring >6 months).",
             "The International Federation of Gynecology and Obstetrics (FIGO) now uses AUB rather than dysfunctional uterine bleeding (DUB)."
           ]
@@ -52,7 +53,7 @@ const Rough = [
             {
               "header": "Coagulopathy",
               "content": [
-                "20% of patients with heavy menstrual bleeding have a bleeding disorder.",
+                "20% of patients with heavy *menstrual bleeding* have a bleeding disorder.",
                 "Two most common coagulopathies involved: von Willebrand disease and thrombocytopenia."
               ]
             },
@@ -290,7 +291,7 @@ const Rough = [
 {
     heading: ' See Also',
     img: '../../../static/images/5.jpg',
-    basicText :[' Dysmenorrhea; Menorrhagia (Heavy Menstrual Bleeding)','Algorithm: Abnormal Uterine Bleeding'],
+    basicText :[' Dysmenorrhea; Menorrhagia (Heavy Menstrual Bleeding)','Algorithm: *Abnormal Uterine Bleeding*'],
 
   },
 
@@ -330,7 +331,22 @@ const Rough = [
    
     ]
 
-  
+
+    const renderTextWithLinks = (text: string) => {
+      const parts = text.split(/(\*.*?\*)/g); // Split by `*text*`
+      return (
+        <>
+          {parts.map((part, index) =>
+            part.startsWith('*') && part.endsWith('*') ? (
+              <Link key={index} fontSize={15} underline='hover' href={`https://en.wikipedia.org/wiki/${part.slice(1, -1)}`} style={{ display: 'inline' }}>{part.slice(1, -1)}</Link>
+
+            ) : (
+              <span key={index} style={{ display: 'inline',fontSize:15 }}>{part}</span>
+            )
+          )}
+        </>
+      );
+    };
 
 const View = () => {
   const SubTitle = styled(Typography)(({}) => ({
@@ -422,7 +438,7 @@ const View = () => {
           </AccordionSummary>
           <AccordionDetails>
             {item.basicText && (
-                item.basicText.map((i,idx)=>(<Typography key = {idx} fontSize={15}>{i}</Typography>))
+                item.basicText.map((i,idx)=>(<Typography key = {idx} fontSize={15}>{renderTextWithLinks(i)}</Typography>))
                 
             )
                  }
@@ -441,17 +457,17 @@ const View = () => {
                           if (typeof subContent === 'object') {
                             return (
                               <Stack key={i} spacing={1}>
-                                <Typography>{subContent.header}</Typography>
+                                <Typography>{renderTextWithLinks(subContent.header)}</Typography>
                                 {subContent.content &&
                                   subContent.content?.map((nested, j) => (
-                                    <UnderTypo key={j}>{nested}</UnderTypo>
+                                    <UnderTypo key={j}>{renderTextWithLinks(nested)}</UnderTypo>
                                   ))}
                               </Stack>
                             );
                           } else {
                             return (
                               <Typography key={i} fontSize={15}>
-                                {subContent}
+                                {renderTextWithLinks(subContent)}
                               </Typography>
                             );
                           }
@@ -469,17 +485,17 @@ const View = () => {
                           if (typeof subContent === 'object') {
                             return (
                               <Stack key={i} spacing={1}>
-                                <Typography>{subContent.header}</Typography>
+                                <Typography>{renderTextWithLinks(subContent.header)}</Typography>
                                 {subContent.content &&
                                   subContent.content?.map((nested, j) => (
-                                    <UnderTypo key={j}>{nested}</UnderTypo>
+                                    <UnderTypo key={j}>{renderTextWithLinks(nested)}</UnderTypo>
                                   ))}
                               </Stack>
                             );
                           } else {
                             return (
                               <Typography key={i} fontSize={15}>
-                                {subContent}
+                                {renderTextWithLinks(subContent)}
                               </Typography>
                             );
                           }
