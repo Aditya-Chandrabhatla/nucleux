@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useRouter } from 'next/router';
+import FullScreenDialog from '@/src/components/Dialog';
 
 const Rough = [
     // Basics
@@ -30,11 +31,17 @@ const Rough = [
             "Abnormal uterine bleeding (AUB) is *uterine bleeding* that is irregular in quantity, frequency, or duration.",
             "May be acute or chronic (occurring >6 months).",
             "The International Federation of Gynecology and Obstetrics (FIGO) now uses AUB rather than dysfunctional uterine bleeding (DUB)."
-          ]
+          ],
+          'conceptImage':'https://media-us.amboss.com/media/thumbs/big_5be0771c63768.jpg',
+          'imageHeading':'Cranial anatomical terms of location and direction',
+          'imageDescription':"In the human skull, anatomical terms of location and direction differ from those used for the torso with respect to their corresponding anatomical landmarks. Where the terms “ventral” (from Latin “towards the belly”) and “dorsal” (from Latin “towards the back”) are used for the torso, the skull is described in terms of “rostral/oral” from Latin “towards the beak [i.e. nose]/mouth) and “occipital/aboral” (from Latin “towards the occipital bone/away from the mouth”). Instead of the terms “medial” (from Latin “towards the middle”) and “lateral” (from Latin “towards the side), the terms “nasal” (from Latin “towards the nose”) and temporal (from Latin “towards the temporal bone”) are used."
         },
         {
           "header": "EPIDEMIOLOGY",
-          "content": ["Adolescent and perimenopausal women are affected most often."]
+          "content": ["Adolescent and perimenopausal women are affected most often."],
+          'conceptImage':'https://media-us.amboss.com/media/thumbs/big_60574b6e73e03.jpg',
+           'imageHeading':'Cranial anatomical terms of location and direction',
+          'imageDescription':"In the human skull, anatomical terms of location and direction differ from those used for the torso with respect to their corresponding anatomical landmarks. Where the terms “ventral” (from Latin “towards the belly”) and “dorsal” (from Latin “towards the back”) are used for the torso, the skull is described in terms of “rostral/oral” from Latin “towards the beak [i.e. nose]/mouth) and “occipital/aboral” (from Latin “towards the occipital bone/away from the mouth”). Instead of the terms “medial” (from Latin “towards the middle”) and “lateral” (from Latin “towards the side), the terms “nasal” (from Latin “towards the nose”) and temporal (from Latin “towards the temporal bone”) are used."
         },
         {
           "header": "Incidence",
@@ -294,6 +301,7 @@ const Rough = [
     heading: ' See Also',
     img: '../../../static/images/5.jpg',
     basicText :[' Dysmenorrhea; Menorrhagia (Heavy Menstrual Bleeding)','Algorithm: *Abnormal Uterine Bleeding*'],
+    
 
   },
 
@@ -354,8 +362,7 @@ const View = () => {
 
   const querying = useRouter()
   const subsubtopic = querying.query
-  console.log(subsubtopic.w)
-
+  
   const SubTitle = styled(Typography)(({}) => ({
     fontWeight: 'bold',
     fontSize: 20,
@@ -511,8 +518,12 @@ const View = () => {
                           }
                         })}
                     </Stack>
+                    {contentItem.conceptImage&&<Stack display={"flex"} flexDirection={"row"} justifyContent={"start"} gap={2} mt={2}>
+                <FullScreenDialog image = {contentItem.conceptImage}  heading={contentItem.imageHeading} decsription={contentItem.imageDescription} />
+                </Stack>}
                   </Stack>
                 )}
+                
               </Stack>
             ))}
           </AccordionDetails>
