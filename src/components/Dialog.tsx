@@ -10,8 +10,10 @@ import Typography from '@mui/material/Typography';
 import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import { TransitionProps } from '@mui/material/transitions';
-import { KeyboardArrowRightOutlined } from '@mui/icons-material';
+import { Add, KeyboardArrowRightOutlined, RestartAlt } from '@mui/icons-material';
 import { Paper, Stack } from '@mui/material';
+import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
+import { Minus } from 'lucide-react';
 
 
 
@@ -40,13 +42,14 @@ export default function FullScreenDialog({image,heading,decsription}) {
   };
 
   return (
-    <React.Fragment>
+    <Stack>
       <Button variant="text" onClick={handleClickOpen}>
         <img src={image} alt='images' width={100}/>
       </Button>
       <Dialog
         fullScreen
         open={open}
+
         onClose={handleClose}
         TransitionComponent={Transition}
       >
@@ -67,16 +70,74 @@ export default function FullScreenDialog({image,heading,decsription}) {
             </Button>
           </Stack>
         </AppBar>
-        <Stack display={'flex'} flexDirection={{md:"row"}} justifyContent={'space-between'}>
+        <Stack display={'flex'} overflow={{lg:"hidden"}} flexDirection={{lg:"row"}} justifyContent={'space-between'}>
 
-            <Stack maxHeight={'100vh'}  sx={{overflowY:"hidden",backgroundColor:"transparent",display:"flex",
-                justifyContent:"center",px:{md:6}}} width={"100%"}>
-                <img src={image} width={'100%'} height={"100%"} alt='image'/>
+            {/* <Stack maxHeight={'100%'}  sx={{overflowY:"hidden",backgroundColor:"transparent",display:"flex",
+                justifyContent:"center",px:{md:`${openCaption?'6%' :'10%'}`}}} width={"100%"}>
+                <img src={image} style={{maxHeight:'100%',maxWidth:"100%"}} alt='image'/>
              
-            </Stack>
+            </Stack> */}
+                    <Stack maxHeight={'100%'}  sx={{overflowY:"hidden",backgroundColor:"transparent",display:"flex",
+                    flexDirection:"row",
+                justifyContent:"center",alignItems:"center",px:{lg:`${openCaption?'6%' :'15%'}`}}} width={"100%"}>
+      <TransformWrapper
+        initialScale={1}
+        minScale={0.5}
+        maxScale={3}
+      >
+        {({ zoomIn, zoomOut, resetTransform }) => (
+          <>
+            <TransformComponent >
+              <img
+                src={image}
+                alt="Zoomable"
+                style={{
+                  maxWidth: `100%`
+                }}
+              />
+            </TransformComponent>
+
+            {/* Floating Paper for Zoom Controls */}
+            <Paper
+              sx={{
+                position: "absolute",
+                bottom: 30, // Position at the bottom
+                left:`${openCaption ?'40%':'50%'}`, // Center horizontally
+                transform: "translateX(-50%)", // Adjust for centering
+                display: {lg:"flex",xs:'none'},
+                gap: 2,
+                padding: 1,
+                zIndex: 10, // Ensure it floats above the image
+                backgroundColor: "rgba(255, 255, 255, 0.8)", // Semi-transparent background
+                boxShadow: 3,
+              }}
+            >
+              <Button
+                variant="text"
+                onClick={() => zoomIn()}
+              >
+                <Add />
+              </Button>
+              <Button
+                variant="text"
+                onClick={() => zoomOut()}
+              >
+                <Minus />
+              </Button>
+              <Button
+                variant="text"
+                onClick={() => resetTransform()}
+              >
+                <RestartAlt />
+              </Button>
+            </Paper>
+          </>
+        )}
+      </TransformWrapper>
+    </Stack>
 
             <Stack  display={`${openCaption?'flex':'none'}`} >
-                <Paper sx={{maxWidth:400,height:"100vh",p:4}}  > 
+                <Paper sx={{maxWidth:{lg:400},height:"100%",p:4,overflowY:"auto"}}  > 
                     <Typography fontSize={18}>{heading}</Typography>
                     <Typography fontSize={15} mt={3}>
                         {decsription}
@@ -89,6 +150,6 @@ export default function FullScreenDialog({image,heading,decsription}) {
 
         </Stack>
       </Dialog>
-    </React.Fragment>
+    </Stack>
   );
 }
