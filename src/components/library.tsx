@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 
@@ -185,7 +186,6 @@ const CollapsibleLibrary = () => {
    setSelectedSubsubtopic(null);  
   };  
 
-  console.log(selectedSection,selectedSubsection,selectedSubsubtopic,selectedSubtopic,selectedTopic)
   
   return (  
    <ThemeProvider theme={darkTheme}>  
