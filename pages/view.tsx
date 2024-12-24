@@ -27,11 +27,11 @@ import axios from 'axios';
 
 
   const renderTextWithLinks = (text: string) => {
-      const parts = text.split(/(\*.*?\*)/g); // Split by `*text*`
+      const parts = text?.split(/(\*.*?\*)/g); // Split by `*text*`
       return (
         <>
-          {parts.map((part, index) =>
-            part.startsWith('*') && part.endsWith('*') ? (
+          {parts?.map((part, index) =>
+            part?.startsWith('*') && part.endsWith('*') ? (
               <Link key={index} fontSize={15} underline='hover' href={`https://en.wikipedia.org/wiki/${part.slice(1, -1)}`} style={{ display: 'inline' }}>{part.slice(1, -1)}</Link>
 
             ) : (
@@ -60,8 +60,8 @@ const View = () => {
         const data = response.data
         if(response.status === 200){
           setWaiting(false)
-        setRough(data[1].layer_f_note)
-        console.log(data[1].layer_f_note)
+        setRough(data[3].layer_f_note)
+        console.log(data[3].layer_f_note)
         }
 
       }catch(e){
