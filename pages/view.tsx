@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
 
@@ -19,15 +20,17 @@ import {
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { useRouter } from 'next/router';
 import FullScreenDialog from '@/src/components/Dialog';
-// import Rough from '@/src/components/Demo/demo';
+
 import axios from 'axios';
+
+import { text } from 'stream/consumers';
 
 
 
 
 
   const renderTextWithLinks = (text: string) => {
-      const parts = text?.split(/(\*.*?\*)/g); // Split by `*text*`
+      const parts = text?.split(/(\*.*?\*)/g); 
       return (
         <>
           {parts?.map((part, index) =>
@@ -41,6 +44,34 @@ import axios from 'axios';
         </>
       );
     };
+
+    const headCheck = (text)=>{
+        const parts = text?.split(':')
+        return(
+            <>
+            <span>{parts[1]}</span>
+            </>
+        )
+    }
+    const contentCheck = (text) =>{
+        const parts = text?.split(':')
+        if (parts.length !==0){
+            const subContent = parts[1]?.split(';')
+        return(
+            <>
+            <p>{parts[0]}</p>
+            {subContent?.map((i,index)=>(
+            <ul key = {index}  style={{marginTop:0}}>
+                    <li style={{ fontSize: 15,
+                color: '#babbbf',
+                paddingLeft: 15,
+                fontFamily: 'cursive',}}>{renderTextWithLinks(i)}</li>
+                </ul>
+            ))}
+            </>
+        )
+    }
+    }
 
 const View = () => {
 
@@ -60,8 +91,8 @@ const View = () => {
         const data = response.data
         if(response.status === 200){
           setWaiting(false)
-        setRough(data[3].layer_f_note)
-        console.log(data[3].layer_f_note)
+        setRough(data[5].layer_f_note)
+        // console.log(data[5].layer_f_note)
         }
 
       }catch(e){
@@ -74,6 +105,7 @@ const View = () => {
     fetching()
   },[])
   
+
   const SubTitle = styled(Typography)(({}) => ({
     fontWeight: 'bold',
     fontSize: 20,
@@ -87,12 +119,7 @@ const View = () => {
     padding: 1,
   }));
 
-  const UnderTypo = styled(Typography)(({}) => ({
-    fontSize: 15,
-    color: '#babbbf',
-    paddingLeft: 15,
-    fontFamily: 'cursive',
-  }));
+
 
   return (
         <Stack p={3} >
@@ -127,131 +154,93 @@ const View = () => {
                 <Divider orientation='horizontal' flexItem />
         <Skeleton variant="rectangular" width={'100%'} height={60} />
         </Stack>
-     } {Rough?.map((item, index) => (
-        <Accordion
-          key={index}
-          sx={{
-            maxHeight: 400,
-            overflow: 'auto',
-            '&::-webkit-scrollbar': { display: 'none' },
-            '-ms-overflow-style': 'none',
-            '&.Mui-expanded': {
-                backgroundColor: '#2d2f33', 
-              }, 
-            
-            
-            
-          }}
-        >
-          <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls="panel1-content"
-            id="panel1-header"
-            sx={{
-                position: 'sticky', // Keeps it fixed at the top of the Accordion
-                top: 0,             // Sticks to the top of the Accordion container
-                zIndex: 1,          // Ensures it stays above the content when scrolling
-                backgroundColor: '#1b2337', // Optional: matches Accordion's background
-                borderBottom: '1px solid #2d2f33',
-                
-                '&.Mui-expanded': {
-      backgroundColor: '#2d2f33', 
-    }, 
-              }}
-          >
-            <Stack
-              sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}
-            >
-              <Avatar src={`${item.img}`} sx={{ mr: 2 }} />
+     } 
 
-              <Typography
-                sx={{
-                  color: '#EC4899',
-                  fontFamily: 'serif',
-                  fontWeight: 'bold',
-                  fontSize: 20,
-                }}
-              >
-                {item.heading}
-              </Typography>
-            </Stack>
-          </AccordionSummary>
-          <AccordionDetails>
-            {item.basicText && (
-                item.basicText.map((i,idx)=>(<Typography key = {idx} fontSize={15}>{renderTextWithLinks(i)}</Typography>))
-                
-            )
-                 }
-            {item.contentLIs?.map((contentItem, idx) => (
-              <Stack key={idx}>
+{Rough?.map((i,index)=>(
 
-                {(contentItem.header === 'ALERT' ||
-                  contentItem.header === 'COMPLICATIONS') ? (
-                  <Paper sx={{ bgcolor: '#f77979', p: 2, mt: 3 }}>
-                    <Stack>
-                      <SubTitle>{contentItem.header}</SubTitle>
-                      <Hr />
-                      <Stack gap={2} mt={2}>
-                      {Array.isArray(contentItem.content) &&
-                        contentItem.content?.map((subContent, i) => {
-                          if (typeof subContent === 'object') {
-                            return (
-                              <Stack key={i} spacing={1}>
-                                <Typography>{renderTextWithLinks(subContent.header)}</Typography>
-                                {subContent.content &&
-                                  subContent.content?.map((nested, j) => (
-                                    <UnderTypo key={j}>{renderTextWithLinks(nested)}</UnderTypo>
-                                  ))}
-                              </Stack>
-                            );
-                          } else {
-                            return (
-                              <Typography key={i} fontSize={15}>
-                                {renderTextWithLinks(subContent)}
-                              </Typography>
-                            );
-                          }
-                        })}
-                    </Stack>
-                    </Stack>
-                  </Paper>
-                ) : (
-                  <Stack mt={3}>
-                    <SubTitle>{contentItem.header}</SubTitle>
-                    <Hr />
-                    <Stack gap={2} mt={2}>
-                      {Array.isArray(contentItem.content) &&
-                        contentItem.content?.map((subContent, i) => {
-                          if (typeof subContent === 'object') {
-                            return (
-                              <Stack key={i} spacing={1}>
-                                <Typography>{renderTextWithLinks(subContent.header)}</Typography>
-                                {subContent.content &&
-                                  subContent.content?.map((nested, j) => (
-                                    <UnderTypo key={j}>{renderTextWithLinks(nested)}</UnderTypo>
-                                  ))}
-                              </Stack>
-                            );
-                          } else {
-                            return (
-                              <Typography key={i} fontSize={15}>
-                                {renderTextWithLinks(subContent)}
-                              </Typography>
-                            );
-                          }
-                        })}
-                    </Stack>
-                    {contentItem.conceptImage&&<Stack display={"flex"} flexDirection={"row"} justifyContent={"start"} gap={2} mt={2}>
-                <FullScreenDialog image = {contentItem.conceptImage}  heading={contentItem.imageHeading} decsription={contentItem.imageDescription} />
-                </Stack>}
-                  </Stack>
-                )}
-                
-              </Stack>
-            ))}
-          </AccordionDetails>
-        </Accordion>
-      ))}
+    <>
+   <Stack key={index} direction={"column"} justifyContent={"center"} mb={4} gap={2}>
+    <Typography  fontSize={20}>{i.overview}</Typography>
+   </Stack>
+   {(i.chunks).map((i,index)=>(
+   <Accordion
+   key={index}
+   sx={{
+     maxHeight: 400,
+     overflow: 'auto',
+     '&::-webkit-scrollbar': { display: 'none' },
+     '-ms-overflow-style': 'none',
+     '&.Mui-expanded': {
+         backgroundColor: '#2d2f33', 
+       }, 
+     
+     
+     
+   }}
+ >
+   <AccordionSummary
+     expandIcon={<ExpandMoreIcon />}
+     aria-controls="panel1-content"
+     id="panel1-header"
+     sx={{
+         position: 'sticky', // Keeps it fixed at the top of the Accordion
+         top: 0,             // Sticks to the top of the Accordion container
+         zIndex: 1,          // Ensures it stays above the content when scrolling
+         backgroundColor: '#1b2337', // Optional: matches Accordion's background
+         borderBottom: '1px solid #2d2f33',
+         
+         '&.Mui-expanded': {
+backgroundColor: '#2d2f33', 
+}, 
+       }}
+   >
+     <Stack
+       sx={{ display: 'flex', alignItems: 'center', flexDirection: 'column',gap:2 }}
+     >
+       <Typography
+         sx={{
+           color: '#EC4899',
+           fontFamily: 'serif',
+           fontWeight: 'bold',
+           fontSize: 20,
+         }}
+       >
+         {i.chunkTitle}
+       </Typography>
+      
+     </Stack>
+   </AccordionSummary>
+   <AccordionDetails>
+     
+     {i.sections?.map((contentItem, idx) => (
+       <Stack key={idx}>
+
+    
+           <Stack mt={3}>
+             <SubTitle>{contentItem.sectionTitle}</SubTitle>
+             <Hr />
+             <Stack>
+               {(contentItem.details)?.map((i,index)=>(
+                <Stack  m={0} key = {index}>{contentCheck(i)} </Stack>
+               ))}
+             </Stack>
+             {contentItem.conceptImage&&<Stack display={"flex"} flexDirection={"row"} justifyContent={"start"} gap={2} mt={2}>
+         <FullScreenDialog image = {contentItem.conceptImage}  heading={contentItem.imageHeading} decsription={contentItem.imageDescription} />
+         </Stack>}
+           </Stack>
+
+         
+       </Stack>
+     ))}
+   </AccordionDetails>
+ </Accordion>
+   ))}
+
+   </>
+
+   
+))}
+     
       
     </Stack>
     </Stack>
