@@ -331,48 +331,8 @@ const Rough2 =[
     }
     ]
     },
-    ],
-    "finalKeysToPreStudySuccess": [
-    {
-    "keyPoint": "Focus on Clinical Patterns",
-    "description": "Recognize hallmark presentations (e.g., painless hematuria in bladder cancer, sudden severe flank pain in nephrolithiasis)."
-    },
-    {
-    "keyPoint": "Emphasize Diagnostics",
-    "description": "Urinalysis, imaging (US, CT), and labs (PSA, tumor markers) guide most urologic workups."
-    },
-    {
-    "keyPoint": "Treatment Algorithms",
-    "description": "Understand typical pathways (short vs. long antibiotic courses, medical vs. surgical management)."
-    },
-    {
-    "keyPoint": "Surgical vs. Conservative Management",
-    "description": "Many kidney traumas and small stones can be managed conservatively if stable. Some emergencies demand prompt surgical intervention."
-    },
-    {
-    "keyPoint": "Age & Risk Factors",
-    "description": "Different etiologies predominate in different age groups (e.g., STDs in younger men, E. coli in older; testicular cancer in younger vs. prostate cancer in older men)."
-    }
-   
-    ],
-    "studyApproach": [
-    {
-    "keyPoint": "Read This Synopsis First",
-    "description": "Build a structured mental map before deep-diving into each topic."
-    },
-    {
-    "keyPoint": "Then Dive Deeper",
-    "description": "Focus on pathophysiology, diagnostics, and step-by-step management for each chunk."
-    },
-    {
-    "keyPoint": "Retention Strategy",
-    "description": "Use mind maps or flowcharts—especially for emergencies, malignancies, and pediatric considerations."
-    },
-    {
-    "keyPoint": "Integration",
-    "description": "Link anatomical knowledge with pathophysiology of infections, obstructions, trauma, and tumors—anatomy underpins surgical decision-making."
-    }
     ]
+
    }
   ]
 
