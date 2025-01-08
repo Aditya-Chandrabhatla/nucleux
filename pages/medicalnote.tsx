@@ -33,6 +33,7 @@ import {
   TableCell,
   TableBody,
   TableContainer,
+  Skeleton,
 } from '@mui/material';
 
 import { AddCircleOutline, ArrowBack, AudioFile, ExpandLess, ExpandMore, Highlight, MenuBook, Psychology, QuestionAnswer, RemoveCircleOutline, SyncAlt } from '@mui/icons-material';
@@ -50,6 +51,7 @@ const MedicalNoteReader = () => {
   const [selectedChunk, setSelectedChunk] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [basicTextOverview,setBasicTextOverview] = useState("")
+  const [loading,setLoading] = useState(true)
 
 
 
@@ -185,16 +187,27 @@ const MedicalNoteReader = () => {
   useEffect(() => {
 
     const fetching= async ()=>{
+      try{
       const response = await  axios.get('https://nucleux-puce.vercel.app/api/layerf/')
     const data = response.data
-    const ansData = data[4].layer_f_note
-    const parsedJSON = processMarkdown(ansData);
-    const rough = [(parsedJSON)]
-    const sidebarSections = rough.flatMap((item) => item.sideBar || []);
-    setSections(sidebarSections);
-    const ans = rough.flatMap((i)=>(i?.basicText[0]?.BasicText))
-    setBasicTextOverview(ans)
+    if (response.status === 200){
+      setLoading(false)
+      const ansData = data[4].layer_f_note
+      const parsedJSON = processMarkdown(ansData);
+      const rough = [(parsedJSON)]
+      const sidebarSections = rough.flatMap((item) => item.sideBar || []);
+      setSections(sidebarSections);
+      const ans = rough.flatMap((i)=>(i?.basicText[0]?.BasicText))
+      setBasicTextOverview(ans)
+    }
 
+      }
+      catch(error){
+        console.error(error as Error.message)
+        
+      }finally{
+        setLoading(false)
+      }
     }
     fetching()
      
@@ -412,7 +425,8 @@ const MedicalNoteReader = () => {
     >
       <Box sx={{ display: 'flex', flex: 1,'&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none'  }}>
         {/* Left Sidebar */}
-        <Drawer
+        
+ <Drawer
           variant="permanent"
           sx={{
             width: 240,
@@ -445,53 +459,63 @@ const MedicalNoteReader = () => {
               Achalasia
             </Typography>
 
-            <List component="nav">
-              {sections.map((section, index) => (
-                <React.Fragment key={index}>
-                  <ListItemButton
-                    selected={activeSection === section?.sidebarHeader.toLowerCase()}
-                    onClick={() => setActiveSection(section?.sidebarHeader.toLowerCase(),toggleChunk(index))}
-                    sx={{
-                      borderRadius: 1,
-                      mb: 0.5,
-                      '&.Mui-selected': {
-                        bgcolor: 'action.selected',
-                        color: 'primary.main',
-                        '&:hover': { bgcolor: 'action.selected' },
-                      },
-                    }}
-                  >
-                    <ListItemText primary={section?.sidebarHeader} />
-                    {section.sidebarContent ? (
-                      openChunks[index] ? (
-                        <ExpandLess onClick={() => toggleChunk(index)} />
-                      ) : (
-                        <ExpandMore onClick={() => toggleChunk(index)} />
-                      )
-                    ) : null}
-                  </ListItemButton>
-                  {section.sidebarContent && (
-                    <Collapse in={openChunks[index]} timeout="auto" unmountOnExit>
-                      <List component="div" disablePadding>
-                        {section.sidebarContent.map((chunk, chunkIndex) => (
-                          <ListItemButton
-                            key={chunkIndex}
-                            sx={{ pl: 4 }}
-                            selected={activeChunk === chunk?.chunkTitle?.toLowerCase()}
-                            onClick={() => setActiveChunk(chunk?.chunkTitle?.toLowerCase(),setSelectedChunk(chunk))}
-                            
-                          >
-                            <ListItemText primary={chunk?.chunkTitle} />
-                          </ListItemButton>
-                        ))}
-                      </List>
-                    </Collapse>
-                  )}
-                </React.Fragment>
-              ))}
-            </List>
+            {loading ?(
+              <Stack gap={1}>
+          <Skeleton variant="rectangular"  width={"100%"} height={60} />
+          <Skeleton variant="rectangular"  width={"100%"} height={60} />
+          <Skeleton variant="rectangular"  width={"100%"} height={60} />
+          <Skeleton variant="rectangular"  width={"100%"} height={60} />
+          <Skeleton variant="rectangular"  width={"100%"} height={60} />
+          </Stack>
+        ) : (<List component="nav">
+          {sections.map((section, index) => (
+            <React.Fragment key={index}>
+              <ListItemButton
+                selected={activeSection === section?.sidebarHeader.toLowerCase()}
+                onClick={() => setActiveSection(section?.sidebarHeader.toLowerCase(),toggleChunk(index))}
+                sx={{
+                  borderRadius: 1,
+                  mb: 0.5,
+                  '&.Mui-selected': {
+                    bgcolor: 'action.selected',
+                    color: 'primary.main',
+                    '&:hover': { bgcolor: 'action.selected' },
+                  },
+                }}
+              >
+                <ListItemText primary={section?.sidebarHeader} />
+                {section.sidebarContent ? (
+                  openChunks[index] ? (
+                    <ExpandLess onClick={() => toggleChunk(index)} />
+                  ) : (
+                    <ExpandMore onClick={() => toggleChunk(index)} />
+                  )
+                ) : null}
+              </ListItemButton>
+              {section.sidebarContent && (
+                <Collapse in={openChunks[index]} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                    {section.sidebarContent.map((chunk, chunkIndex) => (
+                      <ListItemButton
+                        key={chunkIndex}
+                        sx={{ pl: 4 }}
+                        selected={activeChunk === chunk?.chunkTitle?.toLowerCase()}
+                        onClick={() => setActiveChunk(chunk?.chunkTitle?.toLowerCase(),setSelectedChunk(chunk))}
+                        
+                      >
+                        <ListItemText primary={chunk?.chunkTitle} />
+                      </ListItemButton>
+                    ))}
+                  </List>
+                </Collapse>
+              )}
+            </React.Fragment>
+          ))}
+        </List>)}
+            
           </Box>
         </Drawer>
+       
 
         <Divider variant="fullWidth" flexItem orientation="vertical" />
 

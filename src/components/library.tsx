@@ -343,7 +343,7 @@ const CollapsibleLibrary = () => {
 
                       <Stack display={'flex'} flexDirection={'row'} gap={4}>
            {librarySections[selectedSection][selectedSubsection][selectedTopic][selectedSubtopic].map((subsubtopic) => (
-              <Button key = {subsubtopic} onClick={()=>{navigate.push(`/view/?w=${subsubtopic}`)}}   sx={{border:1}}>{subsubtopic}</Button>
+              <Button key = {subsubtopic} onClick={()=>{navigate.push(`/medicalnote/?w=${subsubtopic}`)}}   sx={{border:1}}>{subsubtopic}</Button>
             ))}
            </Stack> 
            <Typography color="text.secondary" mt={3}>  
