@@ -187,7 +187,7 @@ const MedicalNoteReader = () => {
     const fetching= async ()=>{
       const response = await  axios.get('https://nucleux-puce.vercel.app/api/layerf/')
     const data = response.data
-    const ansData = data[5].layer_f_note
+    const ansData = data[4].layer_f_note
     const parsedJSON = processMarkdown(ansData);
     const rough = [(parsedJSON)]
     const sidebarSections = rough.flatMap((item) => item.sideBar || []);
