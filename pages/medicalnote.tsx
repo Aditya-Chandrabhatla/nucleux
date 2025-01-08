@@ -1,185 +1,415 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck
-
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
-  Card,
-  CardContent,
-  Chip,
-  Divider,
+
   Drawer,
-  IconButton,
-  LinearProgress,
+
   List,
   ListItemButton,
   ListItemText,
-  Paper,
-  Popper,
-  Tab,
-  Tabs,
+  Collapse,
   Typography,
-  useTheme
+  useTheme,
+  Paper,
+  LinearProgress,
+  Divider,
+  Stack,
+
+  Link,
+  IconButton,
+  Tabs,
+  Tab,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  TableContainer,
 } from '@mui/material';
-import {
-  ArrowBack,
-  BookmarkBorder,
-  Psychology,
-  QuestionAnswer,
-  AudioFile,
-  Star,
-  Share,
-  RemoveCircleOutline,
-  AddCircleOutline,
-  Highlight,
-  VolumeUp,
-  AccessTime,
-  CheckCircle,
-  Close,
-  MenuBook,
-  Book,
-  SyncAlt
-} from '@mui/icons-material';
 
-// Term definitions database
-const medicalTerms = {
-  'achalasia': {
-    term: 'Achalasia',
-    definition: 'A disorder in which the esophagus (food pipe) loses its ability to move food down and the muscle at the lower end fails to relax properly to let food enter the stomach.',
-    related: ['dysphagia', 'LES']
-  },
-  'LES': {
-    term: 'Lower Esophageal Sphincter (LES)',
-    definition: 'A ring of muscle fibers that functions as a valve between the esophagus and stomach.',
-    related: ['achalasia', 'peristalsis']
-  },
-  'dysphagia': {
-    term: 'Dysphagia',
-    definition: 'Difficulty or discomfort in swallowing.',
-    related: ['achalasia']
-  },
-  'peristalsis': {
-    term: 'Peristalsis',
-    definition: 'The coordinated contraction of muscles that propels food through the digestive tract.',
-    related: ['LES']
-  },
-  'manometry': {
-    term: 'Manometry',
-    definition: 'A test that measures pressure and muscle contractions in the esophagus.',
-    related: ['achalasia', 'LES']
-  }
-};
-
-// Term Preview Popup Component
-const TermPreview = ({ term, anchorEl, onClose }) => {
-  const theme = useTheme();
-  
-  if(!term){
-    return null
-  }
-  
-  return (
-    <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} placement="bottom-start" style={{ zIndex: 1300 }}>
-      <Paper 
-        sx={{ 
-          width: 300, 
-          bgcolor: 'background.paper',
-          boxShadow: theme.shadows[10]
-        }}
-      >
-        <Box sx={{ p: 2, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="subtitle1" color="primary">{term.term}</Typography>
-          <IconButton size="small" onClick={onClose}>
-            <Close fontSize="small" />
-          </IconButton>
-        </Box>
-        <Divider />
-        <Box sx={{ p: 2 }}>
-          <Typography variant="body2">{term.definition}</Typography>
-          {term.related.length > 0 && (
-            <Box sx={{ mt: 2 }}>
-              <Typography variant="caption" color="text.secondary">Related terms:</Typography>
-              <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap', mt: 0.5 }}>
-                {term.related.map(relatedTerm => (
-                  <Chip
-                    key={relatedTerm}
-                    label={relatedTerm}
-                    size="small"
-                    color="primary"
-                    variant="outlined"
-                  />
-                ))}
-              </Box>
-            </Box>
-          )}
-        </Box>
-      </Paper>
-    </Popper>
-  );
-};
+import { AddCircleOutline, ArrowBack, AudioFile, ExpandLess, ExpandMore, Highlight, MenuBook, Psychology, QuestionAnswer, RemoveCircleOutline, SyncAlt } from '@mui/icons-material';
+import { Book, Share, Star } from 'lucide-react';
+import FullScreenDialog from '@/src/components/Dialog';
+import axios from 'axios';
+// import rough from '@/utils/demo';
 
 const MedicalNoteReader = () => {
   const theme = useTheme();
-  const [activeSection, setActiveSection] = useState('summary');
+  const [activeSection, setActiveSection] = useState('');
+  const [activeChunk, setActiveChunk] = useState('');
+  const [sections, setSections] = useState([]);
+  const [openChunks, setOpenChunks] = useState({});
+  const [selectedChunk, setSelectedChunk] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
-  const [termPreview, setTermPreview] = useState({ term: null, anchorEl: null });
+  const [basicTextOverview,setBasicTextOverview] = useState("")
 
-  const sections = [
-    'Summary', 
-    'Definitions', 
-    'Epidemiology', 
-    'Etiology', 
-    'Pathophysiology', 
-    'Clinical Features', 
-    'Diagnosis', 
-    'Differential Diagnosis', 
-    'Treatment', 
-    'Complications', 
-    'References'
-  ];
 
-  const handleTermClick = (term, event) => {
-    event.preventDefault();
-    setTermPreview({
-      term: medicalTerms[term.toLowerCase()],
-      anchorEl: event.currentTarget
-    });
+
+  const cleanText = (text: string): string => {  
+    return text  
+      .replace(/[*>_\-#]/g, '')  
+      .replace(/\s+/g, ' ')  
+      .trim();  
+  };  
+  
+  const convertMarkdownToJSON = (markdown: string): TypeMarkdownProcessor => {  
+    const lines = markdown.split('\n');  
+    const currentStructure: TypeMarkdownProcessor = {  
+      chapterTitle: '',  
+      overview: '', 
+      basicText:[], 
+      sideBar: []  
+    };  
+  
+    let currentPart: any = null;  
+    let currentPartText: any = null; 
+    let currentChunk: any = null;  
+    let currentAccordion: any = null;  
+    let currentTable: any = null;  
+    let isInTable = false;  
+  
+    for (let i = 0; i < lines.length; i++) {  
+      const line = lines[i];  
+      const trimmedLine = line.trim();  
+  
+      // Detect chapter title
+      if (trimmedLine.match(/^#\s/i)) {  
+        currentPart = {  
+          sidebarHeader: cleanText(trimmedLine),  
+          sidebarContent: []  
+        };  
+        currentStructure.sideBar.push(currentPart);  
+      }  
+  
+      else if (trimmedLine.match(/^#####\s+/)) {  
+        currentPartText = {  
+          BasicText: cleanText(trimmedLine),   
+        };  
+        currentStructure.basicText.push(currentPartText); 
+   
+      }  
+      // Detect chunk title
+      else if (trimmedLine.match(/^##\s+/)) {  
+        currentChunk = {  
+          chunkTitle: cleanText(trimmedLine),  
+          chunkDescription: []  
+        };  
+        if (currentPart) {  
+          currentPart.sidebarContent.push(currentChunk);  
+        }  
+      }  
+      // Detect accordion
+      else if (trimmedLine.match(/^###\s+/)) {  
+        currentAccordion = {  
+          AccordinHeading: cleanText(trimmedLine),  
+          AccordinContent: [],  
+          tables: [],  
+          conceptImage: '',  
+          imageHeading: '',  
+          imageDescription: ''  
+        };  
+        if (currentChunk) {  
+          currentChunk.chunkDescription.push(currentAccordion);  
+        }  
+      } 
+  
+    
+      // Detect image content
+      else if (trimmedLine.match(/!\[.*?\]\(.*?\)/)) {  
+        const conceptImage = 'https://media-us.amboss.com/media/thumbs/big_5be0771c63768.jpg';  
+        const imageHeading = 'Cranial anatomical terms of location and direction';  
+        const imageDescription = 'In the human skull, anatomical terms of location and direction differ from those used for the torso with respect to their corresponding anatomical landmarks.';  
+  
+        if (currentAccordion) {  
+          currentAccordion.conceptImage = conceptImage;  
+          currentAccordion.imageHeading = imageHeading;  
+          currentAccordion.imageDescription = imageDescription;  
+        }  
+      }  
+      // Detect table rows
+      else if (trimmedLine.startsWith('|')) {  
+        if (!isInTable) {  
+          isInTable = true;  
+          currentTable = {  
+            title: currentAccordion?.AccordinHeading || 'Table',  
+            headers: trimmedLine  
+              .split('|')  
+              .filter(cell => cell.trim())  
+              .map(cell => cleanText(cell)),  
+            rows: []  
+          };  
+        } else if (!trimmedLine.includes('---')) {  
+          const rowCells = trimmedLine  
+            .split('|')  
+            .filter(cell => cell.trim())  
+            .map(cell => cleanText(cell));  
+          if (rowCells.length > 0 && currentTable) {  
+            currentTable.rows.push(rowCells);  
+          }  
+        }  
+      }  
+      // End of table
+      else if (isInTable && trimmedLine === '') {  
+        isInTable = false;  
+        if (currentAccordion && currentTable && currentTable.rows.length > 0) {  
+          currentAccordion.tables.push(currentTable);  
+        }  
+        currentTable = null;  
+      }  
+      // Generic content
+      else if (trimmedLine !== '' && !isInTable && currentAccordion) {  
+        const content = cleanText(trimmedLine);  
+        if (content) {  
+          currentAccordion.AccordinContent.push(content);  
+        }  
+      }  
+    }  
+  
+    return currentStructure;  
+  };  
+  
+  const processMarkdown = (markdown: string): TypeMarkdownProcessor => {  
+    return convertMarkdownToJSON(markdown);  
   };
 
-  const createLinkedText = (text) => {
-    const words = text.split(/\b/);
-    return words.map((word, index) => {
-      const term = word.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
-      if (medicalTerms[term]) {
-        return (
-          <Button
-            key={index}
-            onClick={(e) => handleTermClick(term, e)}
-            sx={{ 
-              p: 0, 
-              minWidth: 'auto', 
-              color: 'primary.main',
-              textTransform: 'none',
-              '&:hover': { backgroundColor: 'transparent', textDecoration: 'underline' }
+
+  
+  useEffect(() => {
+
+    const fetching= async ()=>{
+      const response = await  axios.get('https://nucleux-puce.vercel.app/api/layerf/')
+    const data = response.data
+    const ansData = data[5].layer_f_note
+    const parsedJSON = processMarkdown(ansData);
+    const rough = [(parsedJSON)]
+    const sidebarSections = rough.flatMap((item) => item.sideBar || []);
+    setSections(sidebarSections);
+    const ans = rough.flatMap((i)=>(i?.basicText[0]?.BasicText))
+    setBasicTextOverview(ans)
+
+    }
+    fetching()
+     
+  }, []);
+
+
+  
+
+  const toggleChunk = (index) => {
+    setOpenChunks((prev) => ({ ...prev, [index]: !prev[index] }));
+  };
+  const renderTextWithLinks = (text: string) => {
+    const parts = text?.split(/(\*.*?\*)/g); 
+    return (
+      <>
+        {parts?.map((part, index) =>
+          part?.startsWith('*') && part.endsWith('*') ? (
+            <Link key={index} fontSize={15} underline='hover' href={`https://en.wikipedia.org/wiki/${part.slice(1, -1)}`} style={{ display: 'inline' }}>{part.slice(1, -1)}</Link>
+
+          ) : (
+            <span key={index} style={{ display: 'inline',fontSize:15 }}>{part}</span>
+          )
+        )}
+      </>
+    );
+  };
+
+
+  const contentCheck = (text) =>{
+      const parts = text?.split(':')
+      if (parts.length !==0){
+          const subContent = parts[1]?.split(';')
+      return(
+        <>
+        {text.includes('http') ? (
+         
+          <a href={`${text}`} style={{color:'blue'}}>{text}</a>
+        ) : (
+          <>
+            <p>{parts[0]}</p>
+            {subContent?.map((i, index) => (
+              <ul key={index} style={{ marginTop: 0 }}>
+                {i.length > 0 && (
+                  <li
+                    style={{
+                      fontSize: 15,
+                      color: '#babbbf',
+                      paddingLeft: 15,
+                      fontFamily: 'cursive',
+                    }}
+                  >
+                    {renderTextWithLinks(i)}
+                  </li>
+                )}
+              </ul>
+            ))}
+          </>
+        )}
+      </>
+      
+      )
+  }
+  }
+  // const SubTitle = styled(Typography)(({}) => ({
+  //   fontWeight: 'bold',
+  //   fontSize: 20,
+  //   color: '#3B82F6',
+  // }));
+
+  // const Hr = styled(Divider)(({}) => ({
+  //   backgroundColor: '#3B82F6',
+  //   width: '100%',
+  //   color: '#3B82F6',
+  //   padding: 1,
+  // }));
+  const renderChunkContent = (chunk) => (
+    <Paper elevation={3} sx={{  maxWidth: '100%', }}>
+  {chunk.chunkDescription.map((desc, index) => (
+    <>
+    <Accordion
+      key={index}
+      sx={{
+        maxHeight: 400,
+        overflow: 'auto',
+        '&::-webkit-scrollbar': { display: 'none' },
+        '-ms-overflow-style': 'none',
+        '&.Mui-expanded': {
+          backgroundColor: '#2d2f33',
+        },
+      }}
+    >
+      <AccordionSummary
+        expandIcon={<ExpandMore />}
+        aria-controls={`panel${index}-content`}
+        id={`panel${index}-header`}
+        sx={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 1,
+          backgroundColor: '#1b2337',
+          borderBottom: '1px solid #2d2f33',
+          '&.Mui-expanded': {
+            backgroundColor: '#2d2f33',
+          },
+        }}
+      >
+        <Stack
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
+          <Typography
+            sx={{
+              color: '#EC4899',
+              fontFamily: 'serif',
+              fontWeight: 'bold',
+              fontSize: 20,
             }}
           >
-            {word}
-          </Button>
-        );
-      }
-      return word;
-    });
-  };
+            {desc?.AccordinHeading}
+          </Typography>
+        </Stack>
+      </AccordionSummary>
+      <AccordionDetails>
+        
+        {desc.AccordinContent?.map((content, idx) => (
+
+          <Stack m={0} key={idx}>
+            {contentCheck(content)}
+          </Stack>
+        ))}
+        {desc.conceptImage && (
+          <Stack
+            display={'flex'}
+            flexDirection={'row'}
+            justifyContent={'start'}
+            gap={2}
+            mt={2}
+          >
+            <FullScreenDialog
+              image={desc?.conceptImage}
+              heading={desc?.imageHeading}
+              decsription={desc?.imageDescription}
+            />
+          </Stack>
+        )}
+        {desc.tables &&
+          desc.tables.map((table, tableIndex) => (
+            <TableContainer
+              key={tableIndex}
+              component={Paper}
+              elevation={3}
+              sx={{ mt: 2, maxWidth: '100%' }}
+            >
+              <Typography
+                variant="h6"
+                sx={{
+                  fontFamily: 'serif',
+                  fontWeight: 'bold',
+                  color: '#EC4899',
+                  my: 1,
+                  textAlign:"center"
+                }}
+              >
+                {table.title}
+              </Typography>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    {table.headers.map((header, headerIndex) => (
+                      <TableCell
+                        key={headerIndex}
+                        sx={{
+                          fontWeight: 'bold',
+                          backgroundColor: '#1b2337',
+                          color: 'white',
+                        }}
+                      >
+                        {header}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {table.rows.map((row, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      {row.map((cell, cellIndex) => (
+                        <TableCell key={cellIndex}>{cell}</TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          ))}
+      </AccordionDetails>
+    </Accordion>
+    </>
+  ))}
+</Paper>
+
+  );
 
   return (
-    <Box sx={{ 
-      height: '100vh', 
-      display: 'flex', 
-      flexDirection: 'column',
-      bgcolor: 'background.default'
-    }}>
+    <Box
+      sx={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        bgcolor: 'background.default',
+      }}
+    >
       <Box sx={{ display: 'flex', flex: 1,'&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none'  }}>
         {/* Left Sidebar */}
         <Drawer
@@ -190,64 +420,84 @@ const MedicalNoteReader = () => {
             '& .MuiDrawer-paper': {
               width: 240,
               boxSizing: 'border-box',
-              border: 'none',
-              bgcolor: 'background.paper','&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none' 
+              bgcolor: 'background.paper',
+              '&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none' 
             },
           }}
         >
           <Box sx={{ p: 2 }}>
-            <Button
-              startIcon={<ArrowBack />}
-              sx={{ mb: 3, color: 'text.secondary' }}
-              href='/home'
-            >
+            <Button startIcon={<ArrowBack />} sx={{ mb: 3, color: 'text.secondary' }} href="/home">
               Back to Library
             </Button>
-            
-            <Typography 
-              variant="h5" 
-              sx={{ 
+
+            <Typography
+              variant="h5"
+              sx={{
                 mb: 3,
                 background: theme.palette.primary.main,
                 backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 color: 'transparent',
-                fontWeight: 'bold'
+                fontWeight: 'bold',
               }}
             >
               Achalasia
             </Typography>
-            
+
             <List component="nav">
-              {sections.map((section) => (
-                <ListItemButton
-                  key={section}
-                  selected={activeSection === section.toLowerCase()}
-                  onClick={() => setActiveSection(section.toLowerCase())}
-                  sx={{
-                    borderRadius: 1,
-                    mb: 0.5,
-                    '&.Mui-selected': {
-                      bgcolor: 'action.selected',
-                      color: 'primary.main',
-                      '&:hover': {
+              {sections.map((section, index) => (
+                <React.Fragment key={index}>
+                  <ListItemButton
+                    selected={activeSection === section?.sidebarHeader.toLowerCase()}
+                    onClick={() => setActiveSection(section?.sidebarHeader.toLowerCase(),toggleChunk(index))}
+                    sx={{
+                      borderRadius: 1,
+                      mb: 0.5,
+                      '&.Mui-selected': {
                         bgcolor: 'action.selected',
+                        color: 'primary.main',
+                        '&:hover': { bgcolor: 'action.selected' },
                       },
-                    },
-                  }}
-                >
-                  <ListItemText primary={section} />
-                </ListItemButton>
+                    }}
+                  >
+                    <ListItemText primary={section?.sidebarHeader} />
+                    {section.sidebarContent ? (
+                      openChunks[index] ? (
+                        <ExpandLess onClick={() => toggleChunk(index)} />
+                      ) : (
+                        <ExpandMore onClick={() => toggleChunk(index)} />
+                      )
+                    ) : null}
+                  </ListItemButton>
+                  {section.sidebarContent && (
+                    <Collapse in={openChunks[index]} timeout="auto" unmountOnExit>
+                      <List component="div" disablePadding>
+                        {section.sidebarContent.map((chunk, chunkIndex) => (
+                          <ListItemButton
+                            key={chunkIndex}
+                            sx={{ pl: 4 }}
+                            selected={activeChunk === chunk?.chunkTitle?.toLowerCase()}
+                            onClick={() => setActiveChunk(chunk?.chunkTitle?.toLowerCase(),setSelectedChunk(chunk))}
+                            
+                          >
+                            <ListItemText primary={chunk?.chunkTitle} />
+                          </ListItemButton>
+                        ))}
+                      </List>
+                    </Collapse>
+                  )}
+                </React.Fragment>
               ))}
             </List>
           </Box>
         </Drawer>
-<Divider variant='fullWidth' flexItem orientation='vertical'/>
+
+        <Divider variant="fullWidth" flexItem orientation="vertical" />
+
         {/* Main Content Area */}
-        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-          {/* Top Navigation Bar */}
-          <Paper 
+        <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' ,}}>
+        <Paper 
             elevation={0} 
             sx={{ 
               p: 2,
@@ -288,8 +538,6 @@ const MedicalNoteReader = () => {
               </Box>
             </Box>
           </Paper>
-
-          {/* Content Tabs */}
           <Tabs
             value={activeTab}
             onChange={(_, newValue) => setActiveTab(newValue)}
@@ -301,67 +549,35 @@ const MedicalNoteReader = () => {
             <Tab icon={<QuestionAnswer />} label="Discuss" />
           </Tabs>
 
-          {/* Main Content */}
-          <Box sx={{ flex: 1, overflow: 'auto', p: 3,'&::-webkit-scrollbar': { display: 'none' }, '-ms-overflow-style': 'none'  }}>
-            <Card elevation={0}>
-              <CardContent>
-                <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography 
-                    variant="h4"
-                    sx={{ 
-                      background: theme.palette.primary.main,
-                      backgroundImage: `linear-gradient(45deg, ${theme.palette.primary.main}, ${theme.palette.secondary.main})`,
-                      backgroundClip: 'text',
-                      WebkitBackgroundClip: 'text',
-                      color: 'transparent',
-                      fontWeight: 'bold'
-                    }}
-                  >
-                    Achalasia
-                  </Typography>
-                  <Box sx={{ display: 'flex', gap: 3 }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                      <AccessTime sx={{ mr: 1, fontSize: 20 }} />
-                      <Typography variant="body2">15 min read</Typography>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
-                      <CheckCircle sx={{ mr: 1, fontSize: 20 }} />
-                      <Typography variant="body2">Last updated: Oct 2023</Typography>
-                    </Box>
-                  </Box>
-                </Box>
+          <Box sx={{ m: 4,overflowY:"scroll",'&::-webkit-scrollbar': { display: 'none' },
+        '-ms-overflow-style': 'none', }}>
+          
+          {selectedChunk ? (
+            <>
+            <Stack mb={2}>
+                <Typography fontSize={15}>{basicTextOverview}</Typography>
 
-                <Paper sx={{ p: 2, mb: 3, bgcolor: 'action.hover' }}>
-                  <Typography variant="h6" sx={{ mb: 1 }}>Quick Facts</Typography>
-                  <List sx={{ listStyleType: 'disc', pl: 2 }}>
-                    <li>{createLinkedText("Failure of LES to relax")}</li>
-                    <li>{createLinkedText("Primary symptom is dysphagia to both solids and liquids")}</li>
-                    <li>{createLinkedText("Diagnosis confirmed by manometry")}</li>
-                    <li>Treatment includes medical and surgical options</li>
-                  </List>
-                </Paper>
-
-                <Box sx={{ mb: 4 }}>
-                  <Typography variant="h5" sx={{ mb: 2 }}>Definition</Typography>
-                  <Typography>
-                    {createLinkedText(
-                      "Achalasia is a primary esophageal motility disorder characterized by insufficient LES relaxation and loss of peristalsis. This results in impaired passage of food and liquids into the stomach."
-                    )}
-                  </Typography>
-                </Box>
-              </CardContent>
-            </Card>
+            </Stack>
+            {renderChunkContent(selectedChunk)}
+            </>
+          ) : (
+            <Typography variant="h4" color="text.secondary" 
+            textTransform={"full-size-kana"} fontWeight={"bold"} textAlign={"center"}>
+              Select a part to view its content
+            </Typography>
+          )}
           </Box>
         </Box>
       </Box>
 
-      {/* Bottom Quick Links */}
-      <Paper 
+      {/* Bottom Navigation Bar */}
+      <Paper
         elevation={0}
-        sx={{ 
+        sx={{
           p: 2,
           borderTop: 1,
-          borderColor: 'divider'
+          borderColor: 'divider',
+          ml: '15%',
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -370,23 +586,20 @@ const MedicalNoteReader = () => {
             <Button startIcon={<Psychology />}>Flash Cards</Button>
             <Button startIcon={<SyncAlt />}>Practice MCQs</Button>
           </Box>
-          
+
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="body2" color="text.secondary">Reading Progress</Typography>
+            <Typography variant="body2" color="text.secondary">
+              Reading Progress
+            </Typography>
             <Box sx={{ width: 200 }}>
               <LinearProgress variant="determinate" value={45} />
             </Box>
-            <Typography variant="body2" color="text.secondary">45%</Typography>
+            <Typography variant="body2" color="text.secondary">
+              45%
+            </Typography>
           </Box>
         </Box>
       </Paper>
-
-      {/* Term Preview Popup */}
-      <TermPreview
-        term={termPreview.term}
-        anchorEl={termPreview.anchorEl}
-        onClose={() => setTermPreview({ term: null, anchorEl: null })}
-      />
     </Box>
   );
 };
